@@ -2,6 +2,7 @@ const fs = require('fs')
 var express = require('express');
 var bcrypt = require('bcrypt');
 var path = require('path');
+var axios = require('axios');
 //var sslredirect = require('./node-heroku-ssl-redirect');
 var app = express();
 var cors = require('cors');
@@ -72,7 +73,11 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     res.render('index')
   });
 
-  //register: storing name, email and password and redirecting to home page after signup
+  app.post('/distancematrix', function (req, res) {  
+    axios.get( 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=' + req.body.from.lat + ',' + req.body.from.lng + '&destinations=' + req.body.to.lat + ',' + req.body.to.lng + '&mode=driving&key=AIzaSyCp3MVau7VEZcpoEnRZei8D7DYyo3dAEnY', {} ).then((response) => {
+      return res.json(response)
+    })        
+  })
 
   app.post('/account/create', function (req, res) {  
     bcrypt.hash(req.body.passwordsignup, saltRounds, function (err,   hash) {
@@ -85,7 +90,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         "$set": {
           name: req.body.usernamesignup,   
           email: req.body.emailsignup,   
-          password: hash   
+          password: hash,  
           date:moment().utc().format('YYYY.MM.DD'),
           role: 'provider'
         }
