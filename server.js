@@ -44,7 +44,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json({ type: 'application/json' }))
 app.set('views', path.join(__dirname, 'static'))
 app.use(express.static(path.join(__dirname, 'static')))
@@ -70,6 +70,10 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     }).catch((err) => {
       return res.json(err)
     })
+  })
+
+  app.post('/post-test', function (req, res) {  
+    return res.json(req.body)
   })
 
   app.post('/directions', function (req, res) {  
