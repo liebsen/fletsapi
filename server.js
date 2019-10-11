@@ -73,8 +73,12 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     res.render('index')
   });
 
+  app.get('/test-distancematrix2', function (req, res) {  
+    return axios.get( 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=13.13212951,80.24748131&destinations=12.9593040,80.2450580&mode=driving&key=' + process.env.API_KEY, {} )
+  })
+
   app.get('/test-distancematrix', function (req, res) {  
-    axios.get( 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=13.13212951,80.24748131&destinations=12.9593040,80.2450580&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
+    return axios.get( 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=13.13212951,80.24748131&destinations=12.9593040,80.2450580&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
       return res.json(response)
     })        
   })
