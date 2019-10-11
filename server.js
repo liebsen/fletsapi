@@ -3,7 +3,6 @@ var express = require('express');
 var bcrypt = require('bcrypt');
 var path = require('path');
 var axios = require('axios');
-//var sslredirect = require('./node-heroku-ssl-redirect');
 var app = express();
 var cors = require('cors');
 var http = require('http').Server(app);
@@ -15,23 +14,15 @@ var bodyParser = require('body-parser')
 var onlinewhen = moment().utc().subtract(10, 'minutes')
 var emailHelper = require('./email/helper')
 var emailClient = emailHelper(null,{
-  from:'"FletUp" <no-reply@fletapp.com>'
+  from:'"FletsApp" <no-reply@fletsapp.com>'
 })
 var gamesort = {date:-1}
 var allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
-  'https://fletapp.net',
-  'https://fletapp.herokuapp.com'
+  'https://fletsapp.net',
+  'https://fletsapp.herokuapp.com'
 ]
-
-/*
-var stockfish = new Worker("stockfish.js");
-
-stockfish.onmessage = function onmessage(event) {
-    console.log(event.data);
-};
-*/
 
 app.use(cors({
   origin: function(origin, callback){
