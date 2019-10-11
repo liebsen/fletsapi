@@ -73,16 +73,20 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     res.render('index')
   });
 
-  app.get('/test-distancematrix', function (req, res) {  
-    return axios.get( 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=13.13212951,80.24748131&destinations=12.9593040,80.2450580&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
+  app.get('/test-distance', function (req, res) {  
+    axios.get( 'https://maps.googleapis.com/maps/api/directions/json?origin=-34.575005,-58.469010&destination=-34.538096,-58.470816&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
       return res.json(response.data)
-    })        
+    }).catch((err) => {
+      return res.json(err)
+    })
   })
 
-  app.post('/distancematrix', function (req, res) {  
-    return axios.get( 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=' + req.body.from.lat + ',' + req.body.from.lng + '&destinations=' + req.body.to.lat + ',' + req.body.to.lng + '&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
+  app.post('/directions', function (req, res) {  
+    axios.get( 'https://maps.googleapis.com/maps/api/directions/json?origin=' + req.body.from.lat + ',' + req.body.from.lng + '&destination=' + req.body.to.lat + ',' + req.body.to.lng + '&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
       return res.json(response.data)
-    })        
+    }).catch((err) => {
+      return res.json(err)
+    })
   })
 
   app.post('/account/create', function (req, res) {  
