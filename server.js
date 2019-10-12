@@ -11,6 +11,7 @@ var moment = require('moment');
 var mongodb = require('mongodb');
 var expressLayouts = require('express-ejs-layouts')
 var bodyParser = require('body-parser')
+const mercadopago = require ('mercadopago');
 var onlinewhen = moment().utc().subtract(10, 'minutes')
 var emailHelper = require('./email/helper')
 var emailClient = emailHelper(null,{
@@ -23,6 +24,10 @@ var allowedOrigins = [
   'https://fletsapp.net',
   'https://fletsapp.herokuapp.com'
 ]
+
+mercadopago.configure({
+  access_token: process.env.MP_TOKEN
+});
 
 app.use(cors({
   origin: function(origin, callback){
@@ -64,16 +69,35 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     res.render('index')
   });
 
-  app.get('/test-distance', function (req, res) {  
-    axios.get( 'https://maps.googleapis.com/maps/api/directions/json?origin=-34.575005,-58.469010&destination=-34.538096,-58.470816&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
-      return res.json(response.data)
-    }).catch((err) => {
-      return res.json(err)
-    })
+  app.post('/confirm', function (req, res) {  
+    let data = {
+      status: 'success',
+      price: 650.00,
+      currency: 'ARS'
+    }
+    return res.json(data)
   })
 
-  app.post('/post-test', function (req, res) {  
-    return res.json(req.body)
+  app.post('/preference', function (req, res) {  
+    // Crea un objeto de preferencia
+    let preference = {
+      items: [
+        {
+          title: 'Mi producto',
+          unit_price: 100,
+          quantity: 1,
+        }
+      ]
+    };
+
+    mercadopago.preferences.create(preference)
+      .then(function(response){
+      // Este valor reemplazará el string "$$init_point$$" en tu HTML
+        global.init_point = response.body.init_point;
+      }).catch(function(error){
+        console.log(error);
+      });    
+      return res.json(req.body)
   })
 
   app.post('/directions', function (req, res) {  
@@ -209,22 +233,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     .limit(limit)
     .skip(offset)
     .toArray(function(err,docs){
-      return res.json(docs)
-    })   
-  })
-
-  app.post('/secretgames', function (req, res) { 
-    if(req.body.filter){
-      req.body.filter.split('|').map(function(x){req.body[x] =  {$ne : null}});       
-      delete req.body.filter
-    }
-    db.collection('games').find(req.body).sort(gamesort).toArray(function(err,docs){
-      return res.json(docs)
-    })   
-  })
-
-  app.post('/online', function (req, res) { 
-    db.collection('games').find({updatedAt: { $gte: onlinewhen.format() }, pgn: {$ne : null}, broadcast : 'true'}).toArray(function(err,docs){
       return res.json(docs)
     })   
   })
