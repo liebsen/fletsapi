@@ -69,16 +69,42 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     res.render('index')
   });
 
-  app.post('/confirm', function (req, res) {  
+  app.post('/flet/estimate', function (req, res) {  
+
+    // calculo manual de cotizacion
+    // todo : hacerlo dinamico
+
+    // ruta
+    const d1 = 20; // Tarifa simple en kms
+    const d2 = 50; // Maximo de ruta en kms
+    const d3 = 700; //ARS
+    const d4 = 38; //ARS
+
+    // carga
+
+    const c1 = 100; // Tarifa simple en kg
+    const c2 = 500; // Maximo de carga en kg
+    const c3 = 150; //ARS
+    const c4 = 3; //ARS
+
+    let ddist = Math.round(req.ruta.distance.value/1000) - d1;
+    if(ddist < 0){
+      ddist = 0;
+    }
+
+    let cdist = d3 + ddist * d4;
+    let dcarga = req.carga.peso - c1;
+    let ccarga = c3 + dcarga * c4;
+    let estimate = Math.round(cdist + ccarga);
     let data = {
       status: 'success',
-      price: 650.00,
+      amount: estimate,
       currency: 'ARS'
     }
     return res.json(data)
   })
 
-  app.post('/preference', function (req, res) {  
+  app.post('/flet/preference', function (req, res) {  
     // Crea un objeto de preferencia
     let preference = {
       items: [
@@ -100,7 +126,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       return res.json(req.body)
   })
 
-  app.post('/directions', function (req, res) {  
+  app.post('/flet/directions', function (req, res) {  
     axios.get( 'https://maps.googleapis.com/maps/api/directions/json?origin=' + req.body.from.lat + ',' + req.body.from.lng + '&destination=' + req.body.to.lat + ',' + req.body.to.lng + '&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
       return res.json(response.data)
     }).catch((err) => {
