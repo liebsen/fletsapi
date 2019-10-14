@@ -21,7 +21,7 @@ var gamesort = {date:-1}
 var allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
-  'https://fletsapp.net',
+  'https://fletsapp.com',
   'https://fletsapp.herokuapp.com'
 ]
 
@@ -49,7 +49,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({ type: 'application/json' }))
 app.set('views', path.join(__dirname, 'static'))
 app.use(express.static(path.join(__dirname, 'static')))
@@ -71,10 +71,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/flet/estimate', function (req, res) {  
 
+    // unique user hardcode settings
     // calculo manual de cotizacion
     // todo : hacerlo dinamico
-
-    // unique user hardcode settings
 
     const preference = {
       distance: {
@@ -112,7 +111,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     }
 
     let wpart = preference.weight.price + delta * preference.weight.karma;
-    let estimate = parseFloat(Math.round(dpart + wpart).toFixed(2);
+    let estimate = parseFloat(Math.round(dpart + wpart)).toFixed(2);
     let data = {
       status: 'success',
       amount: estimate,
