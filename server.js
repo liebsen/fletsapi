@@ -74,28 +74,45 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     // calculo manual de cotizacion
     // todo : hacerlo dinamico
 
-    // ruta
-    const d1 = 20; // Tarifa simple en kms
-    const d2 = 50; // Maximo de ruta en kms
-    const d3 = 700; //ARS
-    const d4 = 38; //ARS
+    // unique user hardcode settings
 
-    // carga
-
-    const c1 = 100; // Tarifa simple en kg
-    const c2 = 500; // Maximo de carga en kg
-    const c3 = 150; //ARS
-    const c4 = 3; //ARS
-
-    let ddist = Math.round(req.ruta.distance.value/1000) - d1;
-    if(ddist < 0){
-      ddist = 0;
+    const preference = {
+      distance: {
+        basic: 20, // Distancia básica en kms
+        max: 50, // Maximo en kms
+        price : 700, // Tarifa básica en ARS
+        karma : 38 // Precio por unidad por exceso del básico
+      },
+      weight: {
+        basic: 100, // Peso básico en kg
+        max: 500, // Maximo en kg
+        price: 150, // Tarifa básica en ARS
+        karma : 3 // Precio por unidad por exceso del básico
+      }
     }
 
-    let cdist = d3 + ddist * d4;
-    let dcarga = req.carga.peso - c1;
-    let ccarga = c3 + dcarga * c4;
-    let estimate = Math.round(cdist + ccarga);
+    // todo: refactor cost feature vector
+    // ie: price + (value - basic) * karma
+
+    // distance
+    let distance = Math.round(req.body.ruta.distance.value/1000) // in km
+    var delta = distance - preference.distance.basic;
+
+    if(delta < 0){
+      delta = 0;
+    }
+
+    let dpart = preference.distance.price + delta * preference.distance.karma;
+
+    // weight 
+    delta = req.body.carga.peso - preference.weight.basic;
+
+    if(delta < 0){
+      delta = 0;
+    }
+
+    let wpart = preference.weight.price + delta * preference.weight.karma;
+    let estimate = parseFloat(Math.round(dpart + wpart).toFixed(2);
     let data = {
       status: 'success',
       amount: estimate,
