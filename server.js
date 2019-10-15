@@ -152,18 +152,22 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/mercadopago/notification', function (req, res) { 
-    db.collection('payments').findOneAndUpdate(
-    {
-      id:req.body.id
-    },
-    {
-      "$set": req.body
-    },{ 
-      upsert: true, 
-      'new': true, 
-      returnOriginal:false 
-    }).then(function(){
-      res.sendStatus(200)
+    mercadopago.com.arnage(req).then(function (response) {
+      db.collection('payments').findOneAndUpdate(
+      {
+        id:response.body.id
+      },
+      {
+        "$set": response.body
+      },{ 
+        upsert: true, 
+        'new': true, 
+        returnOriginal:false 
+      }).then(function(){
+        res.sendStatus(200)
+      })
+    }).then(function (error) {
+      console.log(error);
     })
   })  
 
