@@ -125,8 +125,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let preference = {
       items: [
         {
-          title: 'Mi producto',
-          unit_price: 100,
+          title: 'Mi Flet',
+          unit_price: req.body.estimate.amount,
           quantity: 1,
         }
       ]
@@ -135,11 +135,11 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     mercadopago.preferences.create(preference)
       .then(function(response){
       // Este valor reemplazará el string "$$init_point$$" en tu HTML
-        global.init_point = response.body.init_point;
+        //global.init_point = response.body.init_point;
+        return res.json(response.body)
       }).catch(function(error){
         console.log(error);
-      });    
-      return res.json(req.body)
+      });      
   })
 
   app.post('/flet/directions', function (req, res) {  
