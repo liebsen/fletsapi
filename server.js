@@ -126,7 +126,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       items: [
         {
           title: 'Mi Flet',
-          unit_price: req.body.estimate.amount,
+          unit_price: parseFloat(req.body.estimate.amount),
           quantity: 1,
         }
       ]
