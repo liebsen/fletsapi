@@ -26,6 +26,7 @@ var allowedOrigins = [
 ]
 
 mercadopago.configure({
+  sandbox: true,
   access_token: process.env.MP_TOKEN
 });
 
@@ -126,10 +127,18 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       items: [
         {
           title: 'Mi Flet',
+          description: "",
           unit_price: parseFloat(req.body.estimate.amount),
           quantity: 1,
         }
-      ]
+      ],
+      notification_url: req.protocol + '://' + req.get('host') + "/mercadopago/notification"
+      /*,
+      back_urls: {
+        success: process.env.APP_URL + "/mercadopago/success",
+        pending: process.env.APP_URL + "/mercadopago/pending",
+        failure: process.env.APP_URL + "/mercadopago/failure"
+      }*/
     };
 
     mercadopago.preferences.create(preference)
@@ -141,6 +150,22 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         console.log(error);
       });      
   })
+
+  app.post('/mercadopago/notification', function (req, res) { 
+    db.collection('payments').findOneAndUpdate(
+    {
+      id:req.body.id
+    },
+    {
+      "$set": req.body
+    },{ 
+      upsert: true, 
+      'new': true, 
+      returnOriginal:false 
+    }).then(function(){
+      res.sendStatus(200)
+    })
+  })  
 
   app.post('/flet/directions', function (req, res) {  
     axios.get( 'https://maps.googleapis.com/maps/api/directions/json?origin=' + req.body.from.lat + ',' + req.body.from.lng + '&destination=' + req.body.to.lat + ',' + req.body.to.lng + '&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
