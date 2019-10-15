@@ -150,7 +150,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           id:response.body.id
         },
         {
-          "$set": response.body
+          "$set": req.body
         },{ 
           upsert: true, 
           'new': true, 
