@@ -116,7 +116,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let estimate = parseFloat(Math.round(dpart + wpart)).toFixed(2);
     let data = {
       status: 'success',
-      amount: estimate,
+      //amount: estimate,
+      amount: 50.00,
       currency: 'ARS'
     }
     return res.json(data)
