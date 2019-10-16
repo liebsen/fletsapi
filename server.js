@@ -245,6 +245,30 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     }
   })  
 
+  app.post('/contact', function (req, res) {  
+    emailClient.send({
+      //to:'mafrith@gmail.com',
+      to:'telemagico@gmail.com',
+      subject:'Contacto desde FletsApp',
+      data:{
+        title:'Contacto desde FletsApp',
+        message: 'Nombre: ' + req.body.first_name + '<br>Apellido : ' + req.body.last_name + '<br>Email: ' + req.body.email + '<br>Comentarios : ' + req.body.comment + '<br>'
+        //link: process.env.APP_URL + '/contact/' + notification.value.external_reference,
+        //linkText:'Ver detalle del envío'
+      },
+      templatePath:path.join(__dirname,'/email/template.html')
+    }).then(function(){
+      res.json({
+        status: 'success'
+      })
+    }).catch(function(err){
+      if(err) console.log(err)
+      res.json({
+        status: 'error'
+      })
+    })    
+  })
+
   app.post('/flet/directions', function (req, res) {  
     axios.get( 'https://maps.googleapis.com/maps/api/directions/json?origin=' + req.body.from.lat + ',' + req.body.from.lng + '&destination=' + req.body.to.lat + ',' + req.body.to.lng + '&mode=driving&key=' + process.env.API_KEY, {} ).then((response) => {
       return res.json(response.data)
