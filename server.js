@@ -290,15 +290,16 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
                 console.log(notification.value.status)
                 //if(response.body.status === 'approved'){
 
-                return emailClient.send({
+                emailClient.send({
                   //to:'mafrith@gmail.com',
                   to:'telemagico@gmail.com',
                   subject:'Tenés un envío de FletsApp!',
                   data:{
                     title:'Marina! Tenés un envío pendiente :' + notification.value.status,
-                    message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>'
-                    //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
-                    //linkText:'Ver el estado de mi envío'
+                    message: 'This is a test message',
+                    //message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>'
+                    link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
+                    linkText:'Ver detalle del envío'
                   },
                   templatePath:path.join(__dirname,'/email/template.html')
                 }).then(function(){
@@ -312,12 +313,15 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
                   //}
               }).catch((err) => {
+                console.log("----error1")
                 return res.json(err)
               })
             }).catch((err) => {
+              console.log("----error2")
               return res.json(err)
             })
           }).catch((err) => {
+            console.log("----error3")
             return res.json(err)
           })
         } else {
