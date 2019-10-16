@@ -197,6 +197,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     }).catch(function(err){
       console.log("email error")
       if(err) console.log(err)
+      res.sendStatus(500)
     })
   })
 
