@@ -285,35 +285,32 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
               }).then(function(preference){
                 console.log("4")
                 console.log(preference.value)
-                console.log("5")
-                console.log(notification.value.status)
-                //if(response.body.status === 'approved'){
+                if(notification.value.status === 'approved'){
+
+                  console.log("5")
+                  console.log(notification.value.status)
                 
-                /*                  
-                emailClient.send({
-                  //to:'mafrith@gmail.com',
-                  to:'telemagico@gmail.com',
-                  subject:'Tenés un envío de FletsApp!',
-                  data:{
-                    title:'Marina! Tenés un envío pendiente :' + notification.value.status,
-                    message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
-                    link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
-                    linkText:'Ver detalle del envío'
-                  },
-                  templatePath:path.join(__dirname,'/email/template.html')
-                }).then(function(){
-                  console.log("6")
-                  res.sendStatus(200)
-                }).catch(function(err){
-                  console.log("email error")
-                  if(err) console.log(err)
-                  res.sendStatus(200)
-                })
-                */
+                  emailClient.send({
+                    //to:'mafrith@gmail.com',
+                    to:'telemagico@gmail.com',
+                    subject:'Tenés un envío de FletsApp!',
+                    data:{
+                      title:'Marina! Tenés un envío pendiente :' + notification.value.status,
+                      message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
+                      link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
+                      linkText:'Ver detalle del envío'
+                    },
+                    templatePath:path.join(__dirname,'/email/template.html')
+                  }).then(function(){
+                    console.log("6")
+                    res.sendStatus(200)
+                  }).catch(function(err){
+                    console.log("email error")
+                    if(err) console.log(err)
+                    res.sendStatus(200)
+                  })
 
-                res.sendStatus(200)
-
-                  //}
+                }
               }).catch((err) => {
                 console.log("----error1")
                 return res.json(err)
