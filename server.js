@@ -116,7 +116,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let data = {
       status: 'success',
       //amount: estimate,
-      amount: 20.00,
+      amount: 10.00,
       currency: 'ARS'
     }
     return res.json(data)
