@@ -14,9 +14,6 @@ var _ = require('lodash');
 //   }
 // }
 
-console.log("SMTP settings")
-console.log(process.env.EMAIL_SMTP_USER)
-console.log(process.env.EMAIL_SMTP_PASS)
 var defaultSMTPConfig = {
   host: 'smtp.gmail.com',
   port: 587,

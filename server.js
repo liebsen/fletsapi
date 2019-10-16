@@ -15,6 +15,7 @@ const mercadopago = require ('mercadopago');
 var onlinewhen = moment().utc().subtract(10, 'minutes')
 var emailHelper = require('./email/helper')
 var emailClient = emailHelper()
+var nodeMailer = require('nodemailer')
 var gamesort = {date:-1}
 var allowedOrigins = [
   'http://localhost:4000',
@@ -176,6 +177,34 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       res.redirect(process.env.APP_URL + '/pago-completado/' + req.body.payment_status)
     })
   })
+
+
+  app.post('/sendemail', function (req, res) {
+    let transporter = nodeMailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+            // should be replaced with real sender's account
+            user: process.env.EMAIL_SMTP_USER,
+            pass: process.env.EMAIL_SMTP_PASS
+        }
+    });
+    let mailOptions = {
+        // should be replaced with real recipient's account
+        to: 'telemagico@gmail.com',
+        subject: "Helo from Mars",
+        text: "nevermind was an overstatement."
+    };
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Message %s sent: %s', info.messageId, info.response);
+    });
+    //res.writeHead(301, { Location: 'index.html' });
+    res.end();
+  });
 
   app.get('/testemail', function (req, res) { 
     console.log("1")
