@@ -177,6 +177,28 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
+  app.get('/testemail', function (req, res) { 
+    console.log("1")
+    emailClient.send({
+      //to:'mafrith@gmail.com',
+      to:'telemagico@gmail.com',
+      subject:'Tenés un envío de FletsApp!',
+      data:{
+        title:'Test email',
+        message: 'Message<br>here'
+        //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
+        //linkText:'Ver el estado de mi envío'
+      },
+      templatePath:path.join(__dirname,'/email/template.html')
+    }).then(function(){
+      console.log("6")
+      res.sendStatus(200)
+    }).catch(function(err){
+      console.log("email error")
+      if(err) console.log(err)
+    })
+  }
+
   app.post('/mercadopago/notification', function (req, res) { 
     if(req.body.data){
       console.log("1")
@@ -216,7 +238,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
             console.log("5")
             console.log(notification.value.status)
             //if(response.body.status === 'approved'){
-              
+
             emailClient.send({
               //to:'mafrith@gmail.com',
               to:'telemagico@gmail.com',
