@@ -249,72 +249,79 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/mercadopago/notification', function (req, res) { 
     if(req.body.data){
-      console.log("1")
-      console.log("id: " + req.body.data.id)
-      axios.get('https://api.mercadopago.com/v1/payments/' + req.body.data.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
-        console.log("2")
-        db.collection('notifications').findOneAndUpdate(
-        {
-          id:response.data.id
-        },
-        {
-          "$set": response.data
-        },{ 
-          upsert: true, 
-          'new': true, 
-          returnOriginal:false 
-        }).then(function(notification){
+      // check if notification exists
+      db.collection('notifications').find({id:req.body.data.id}).toArray(function(err, result) {
+        if(result.length === 0){
+          console.log("1")
+          console.log("id: " + req.body.data.id)
+          axios.get('https://api.mercadopago.com/v1/payments/' + req.body.data.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
+            console.log("2")
+            db.collection('notifications').findOneAndUpdate(
+            {
+              id:response.data.id
+            },
+            {
+              "$set": response.data
+            },{ 
+              upsert: true, 
+              'new': true, 
+              returnOriginal:false 
+            }).then(function(notification){
 
-          console.log("3")
-          console.log(notification.value.external_reference)
+              console.log("3")
+              console.log(notification.value.external_reference)
 
-          db.collection('preferences').findOneAndUpdate(
-          {
-            id:notification.value.external_reference
-          },
-          {
-            "$set": {
-              payment_status: notification.value.status
-            }
-          },{ 
-            upsert: true, 
-            'new': true, 
-            returnOriginal:false 
-          }).then(function(preference){
-            console.log("4")
-            console.log(preference.value.id)
-            console.log("5")
-            console.log(notification.value.status)
-            //if(response.body.status === 'approved'){
-
-            emailClient.send({
-              //to:'mafrith@gmail.com',
-              to:'telemagico@gmail.com',
-              subject:'Tenés un envío de FletsApp!',
-              data:{
-                title:'Marina! Tenés un envío pendiente :' + notification.value.status,
-                message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>'
-                //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
-                //linkText:'Ver el estado de mi envío'
+              db.collection('preferences').findOneAndUpdate(
+              {
+                id:notification.value.external_reference
               },
-              templatePath:path.join(__dirname,'/email/template.html')
-            }).then(function(){
-              console.log("6")
-              res.sendStatus(200)
-            }).catch(function(err){
-              console.log("email error")
-              if(err) console.log(err)
-            })
+              {
+                "$set": {
+                  payment_status: notification.value.status
+                }
+              },{ 
+                upsert: true, 
+                'new': true, 
+                returnOriginal:false 
+              }).then(function(preference){
+                console.log("4")
+                console.log(preference.value.id)
+                console.log("5")
+                console.log(notification.value.status)
+                //if(response.body.status === 'approved'){
 
-              //}
+                emailClient.send({
+                  //to:'mafrith@gmail.com',
+                  to:'telemagico@gmail.com',
+                  subject:'Tenés un envío de FletsApp!',
+                  data:{
+                    title:'Marina! Tenés un envío pendiente :' + notification.value.status,
+                    message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>'
+                    //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
+                    //linkText:'Ver el estado de mi envío'
+                  },
+                  templatePath:path.join(__dirname,'/email/template.html')
+                }).then(function(){
+                  console.log("6")
+                  res.sendStatus(200)
+                }).catch(function(err){
+                  console.log("email error")
+                  if(err) console.log(err)
+                })
+
+                  //}
+              }).catch((err) => {
+                return res.json(err)
+              })
+            }).catch((err) => {
+              return res.json(err)
+            })
           }).catch((err) => {
             return res.json(err)
           })
-        }).catch((err) => {
-          return res.json(err)
-        })
-      }).catch((err) => {
-        return res.json(err)
+        } else {
+          res.sendStatus(200)
+        }
       })
     }
   })  
