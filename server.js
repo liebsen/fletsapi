@@ -289,7 +289,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
                 console.log("5")
                 console.log(notification.value.status)
                 //if(response.body.status === 'approved'){
-
+                
+                /*                  
                 emailClient.send({
                   //to:'mafrith@gmail.com',
                   to:'telemagico@gmail.com',
@@ -309,6 +310,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
                   if(err) console.log(err)
                   res.sendStatus(200)
                 })
+                */
+
+                res.sendStatus(200)
 
                   //}
               }).catch((err) => {
