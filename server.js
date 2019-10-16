@@ -180,6 +180,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/mercadopago/notification', function (req, res) { 
     console.log("1")
+    console.log(req.body)
     res.sendStatus(200)
     console.log("calling: " + 'https://api.mercadopago.com/v1/payments/' + req.body.id + '?access_token=' + process.env.MP_TOKEN)
     axios.get('https://api.mercadopago.com/v1/payments/' + req.body.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
