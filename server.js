@@ -185,10 +185,10 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       to:'telemagico@gmail.com',
       subject:'Tenés un envío de FletsApp!',
       data:{
-        title:'Test email',
+        title:'You new brand notification',
         message: 'Message<br>here'
-        //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
-        //linkText:'Ver el estado de mi envío'
+        link: process.env.APP_URL + '/envio/2222',
+        linkText:'Ver detalle del envío'
       },
       templatePath:path.join(__dirname,'/email/template.html')
     }).then(function(){
