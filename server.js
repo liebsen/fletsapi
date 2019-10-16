@@ -75,7 +75,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
     // unique user hardcode settings
     // calculo manual de cotizacion
-    // todo : hacerlo dinamico
+    // todo : hacerlo dinamico para plataforma
 
     const preference = {
       distance: {
@@ -128,6 +128,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let preference = {
       items: [
         {
+          id: random_code(10),
           title: 'Envío con FletsApp',
           description: "",
           unit_price: parseFloat(req.body.estimate.amount),
