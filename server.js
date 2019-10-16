@@ -186,7 +186,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       subject:'Tenés un envío de FletsApp!',
       data:{
         title:'You new brand notification',
-        message: 'Message<br>here'
+        message: 'Message<br>here',
         link: process.env.APP_URL + '/envio/2222',
         linkText:'Ver detalle del envío'
       },
