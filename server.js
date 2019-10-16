@@ -26,9 +26,9 @@ var allowedOrigins = [
 ]
 
 mercadopago.configure({
-  sandbox: true,
-  access_token: process.env.MP_TOKEN_TEST
-  //access_token: process.env.MP_TOKEN
+  //sandbox: true,
+  //access_token: process.env.MP_TOKEN_TEST
+  access_token: process.env.MP_TOKEN
 });
 
 app.use(cors({
@@ -117,7 +117,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let data = {
       status: 'success',
       //amount: estimate,
-      amount: 50.00,
+      amount: 20.00,
       currency: 'ARS'
     }
     return res.json(data)
@@ -131,36 +131,30 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           title: 'Envío con FletsApp',
           description: "",
           unit_price: parseFloat(req.body.estimate.amount),
+          currency_id: "ARS",
           quantity: 1,
         }
       ],
       notification_url: req.protocol + '://' + req.get('host') + "/mercadopago/notification"
-      /*,
-      back_urls: {
-        success: process.env.APP_URL + "/mercadopago/success",
-        pending: process.env.APP_URL + "/mercadopago/pending",
-        failure: process.env.APP_URL + "/mercadopago/failure"
-      }*/
     };
 
-    mercadopago.preferences.create(preference)
-      .then(function(response){
-        db.collection('preferences').findOneAndUpdate(
-        {
-          id:response.body.id
-        },
-        {
-          "$set": req.body
-        },{ 
-          upsert: true, 
-          'new': true, 
-          returnOriginal:false 
-        }).then(function(){
-          return res.json(response.body)
-        })
-      }).catch(function(error){
-        console.log(error);
-      });      
+    mercadopago.preferences.create(preference).then(function(response){
+      db.collection('preferences').findOneAndUpdate(
+      {
+        id:response.body.id
+      },
+      {
+        "$set": req.body
+      },{ 
+        upsert: true, 
+        'new': true, 
+        returnOriginal:false 
+      }).then(function(){
+        return res.json(response.body)
+      })
+    }).catch(function(error){
+      console.log(error);
+    });      
   })
 
   app.post('/procesar-pago', function (req, res) { 
@@ -177,27 +171,13 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       'new': true, 
       returnOriginal:false 
     }).then(function(preference){
-      if(req.body.payment_status === 'approved'){
-        emailClient.send({
-          to:'mafrith@gmail.com',
-          subject:'Tenés un envío de FletsApp!',
-          data:{
-            title:'Marina! Tenés un envío pendiente',
-            message: 'Nombre: ' + preference.datos.nombre + '<br>Teléfono : ' + preference.datos.telefono + '<br>Pasar a buscar en: ' + preference.ruta.from.formatted_address + '<br>Entregar en : ' + preference.ruta.to.formatted_address + '<br>'
-            //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
-            //linkText:'Ver el estado de mi envío'
-          },
-          templatePath:path.join(__dirname,'/email/template.html')
-        }).catch(function(err){
-          if(err) console.log(err)
-        })
-      }
+
       res.redirect(process.env.API_URL + '/mp/' + req.body.payment_status)
     })
   })
 
   app.post('/mercadopago/notification', function (req, res) { 
-    mercadopago.com.arnage(req.body).then(function (response) {
+    axios.get( 'https://api.mercadopago.com/v1/payments/' + req.body.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
       db.collection('notifications').findOneAndUpdate(
       {
         id:response.body.id
@@ -208,11 +188,27 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         upsert: true, 
         'new': true, 
         returnOriginal:false 
-      }).then(function(){
+      }).then(function(doc){
         res.sendStatus(200)
+        //if(response.body.status === 'approved'){
+          emailClient.send({
+            to:'mafrith@gmail.com',
+            subject:'Tenés un envío de FletsApp!',
+            data:{
+              title:'Marina! Tenés un envío pendiente',
+              message: 'Nombre: ' + preference.datos.nombre + '<br>Teléfono : ' + preference.datos.telefono + '<br>Pasar a buscar en: ' + preference.ruta.from.formatted_address + '<br>Entregar en : ' + preference.ruta.to.formatted_address + '<br>'
+              //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
+              //linkText:'Ver el estado de mi envío'
+            },
+            templatePath:path.join(__dirname,'/email/template.html')
+          }).catch(function(err){
+            if(err) console.log(err)
+          })
+        //}
       })
-    }).then(function (error) {
-      console.log(error);
+
+    }).catch((err) => {
+      return res.json(err)
     })
   })  
 
