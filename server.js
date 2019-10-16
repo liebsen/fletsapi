@@ -197,7 +197,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       console.log("email error")
       if(err) console.log(err)
     })
-  }
+  })
 
   app.post('/mercadopago/notification', function (req, res) { 
     if(req.body.data){
