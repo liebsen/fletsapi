@@ -179,6 +179,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.get('/testemail', function (req, res) { 
     console.log("1")
+
     emailClient.send({
       //to:'mafrith@gmail.com',
       to:'telemagico@gmail.com',

@@ -45,6 +45,8 @@ Client.prototype.send = function (emailConfig) {
   if(emailConfig.templatePath){
     emailConfig.template = fs.readFileSync(emailConfig.templatePath).toString();
   }
+  console.log("emailConfig")
+  console.log(emailConfig)
 
   if(!emailConfig.template){
     emailConfig.template = '{{#data}} <h3>{{key}}</h3> {{value}} <hr/> {{/data}}';
@@ -75,6 +77,7 @@ Client.prototype.send = function (emailConfig) {
 module.exports = function(smtpConfig,emailsConfig){
   return new Client(smtpConfig,emailsConfig);
 }
+
 exports.client = Client;
 
 // test
