@@ -174,8 +174,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       'new': true, 
       returnOriginal:false 
     }).then(function(preference){
-
-      res.redirect(process.env.API_URL + '/mp/' + req.body.payment_status)
+      res.redirect(process.env.APP_URL + '/pago-completado/' + req.body.payment_status)
     })
   })
 
