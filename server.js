@@ -196,8 +196,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         returnOriginal:false 
       }).then(function(doc){
         console.log("3")
-        
-        console.log("4")
         console.log(response.body.status)
         //if(response.body.status === 'approved'){
           emailClient.send({
