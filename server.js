@@ -115,8 +115,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let estimate = parseFloat(Math.round(dpart + wpart)).toFixed(2);
     let data = {
       status: 'success',
-      //amount: estimate,
-      amount: 10.00,
+      amount: estimate,
+      //amount: 10.00,
       currency: 'ARS'
     }
     return res.json(data)
@@ -178,83 +178,12 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
-  app.get('/sendemail', function (req, res) {
-    let transporter = nodeMailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-            // should be replaced with real sender's account
-            user: process.env.EMAIL_SMTP_USER,
-            pass: process.env.EMAIL_SMTP_PASS
-        }
-    });
-    let mailOptions = {
-        // should be replaced with real recipient's account
-        to: 'telemagico@gmail.com',
-        subject: "Helo from Mars",
-        text: "nevermind was an overstatement."
-    };
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            return console.log(error);
-        }
-        console.log('Message %s sent: %s', info.messageId, info.response);
-    });
-    //res.writeHead(301, { Location: 'index.html' });
-    res.end();
-  });
-
-  app.get('/testemail', function (req, res) { 
-    console.log("1")
-
-    emailClient.send({
-      //to:'mafrith@gmail.com',
-      to:'telemagico@gmail.com',
-      subject:'Tenés un envío de FletsApp!',
-      data:{
-        title:'You new brand notification',
-        message: 'Message<br>here',
-        link: process.env.APP_URL + '/envio/2222',
-        linkText:'Ver detalle del envío'
-      },
-      templatePath:path.join(__dirname,'/email/template.html')
-    }).then(function(){
-      console.log("6")
-      res.sendStatus(200)
-    }).catch(function(err){
-      console.log("email error")
-      if(err) console.log(err)
-      res.sendStatus(500)
-    })
-  })
-
-
-  app.get('/testfind', function (req, res) { 
-
-    db.collection('notifications').find({id:5328939178}).toArray(function(err, doc) {
-      console.log("A")
-      console.log(doc.length)
-
-      db.collection('notifications').find({id:5328}).toArray(function(err, doc2) {
-        console.log("B")
-        console.log(doc2.length)
-      })
-    })
-
-    res.sendStatus(200)
-  });
-
-
   app.post('/mercadopago/notification', function (req, res) { 
     if(req.body.data){
       // check if notification exists
       db.collection('notifications').find({id:req.body.data.id}).toArray(function(err, result) {
         if(result.length === 0){
-          console.log("1")
-          console.log("id: " + req.body.data.id)
           axios.get('https://api.mercadopago.com/v1/payments/' + req.body.data.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
-            console.log("2")
             db.collection('notifications').findOneAndUpdate(
             {
               id:response.data.id
@@ -266,10 +195,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
               'new': true, 
               returnOriginal:false 
             }).then(function(notification){
-
-              console.log("3")
-              console.log(notification.value.external_reference)
-
               db.collection('preferences').findOneAndUpdate(
               {
                 id:notification.value.external_reference
@@ -283,44 +208,32 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
                 'new': true, 
                 returnOriginal:false 
               }).then(function(preference){
-                console.log("4")
-                console.log(preference.value)
                 if(notification.value.status === 'approved'){
-
-                  console.log("5")
-                  console.log(notification.value.status)
-                
                   emailClient.send({
-                    //to:'mafrith@gmail.com',
-                    to:'telemagico@gmail.com',
-                    subject:'Tenés un envío de FletsApp!',
+                    to:'mafrith@gmail.com',
+                    //to:'telemagico@gmail.com',
+                    subject:'Tenés un envío de FletsApp',
                     data:{
-                      title:'Marina! Tenés un envío pendiente :' + notification.value.status,
+                      title:'Marina: Te salió un envío!',
                       message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
                       link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
                       linkText:'Ver detalle del envío'
                     },
                     templatePath:path.join(__dirname,'/email/template.html')
                   }).then(function(){
-                    console.log("6")
                     res.sendStatus(200)
                   }).catch(function(err){
-                    console.log("email error")
                     if(err) console.log(err)
                     res.sendStatus(200)
                   })
-
                 }
               }).catch((err) => {
-                console.log("----error1")
                 return res.json(err)
               })
             }).catch((err) => {
-              console.log("----error2")
               return res.json(err)
             })
           }).catch((err) => {
-            console.log("----error3")
             return res.json(err)
           })
         } else {
