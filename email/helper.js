@@ -13,11 +13,15 @@ var _ = require('lodash');
 //     pass: 'bZk3tafK8KjrT3F'
 //   }
 // }
+
+console.log("SMTP settings")
+console.log(process.env.EMAIL_SMTP_USER)
+console.log(process.env.EMAIL_SMTP_PASS)
 var defaultSMTPConfig = {
   host: 'smtp.gmail.com',
-  //port: 587,
-  port: 465,
-  secure: true,
+  port: 587,
+  //port: 465,
+  //secure: true,
   auth: {
     user: process.env.EMAIL_SMTP_USER,
     pass: process.env.EMAIL_SMTP_PASS
