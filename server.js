@@ -179,11 +179,13 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/mercadopago/notification', function (req, res) { 
-    if(req.body.data.id){
+    if(req.body.data){
       console.log("1")
       console.log("id: " + req.body.data.id)
       axios.get('https://api.mercadopago.com/v1/payments/' + req.body.data.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
         console.log("2")
+        console.log(response.body)
+        
         db.collection('notifications').findOneAndUpdate(
         {
           id:response.body.id
