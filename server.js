@@ -230,6 +230,24 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
+
+  app.get('/testfind', function (req, res) { 
+
+    db.collection('notifications').find({id:5328939178}).then(function(doc){
+      console.log("3")
+      console.log(doc.val)
+
+      db.collection('notifications').find({id:5328}).then(function(doc){
+        console.log("2")
+        console.log(doc.val)
+      })
+
+    })
+
+    res.sendStatus(200)
+  });
+
+
   app.post('/mercadopago/notification', function (req, res) { 
     if(req.body.data){
       console.log("1")
