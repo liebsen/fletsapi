@@ -125,10 +125,11 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/flet/preference', function (req, res) {  
     // Crea un objeto de preferencia
+    var id = random_code(10)
     let preference = {
       items: [
         {
-          id: random_code(10),
+          id: id,
           title: 'Envío con FletsApp',
           description: "",
           unit_price: parseFloat(req.body.estimate.amount),
@@ -136,7 +137,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           quantity: 1,
         }
       ],
-      notification_url: req.protocol + '://' + req.get('host') + "/mercadopago/notification"
+      notification_url: req.protocol + '://' + req.get('host') + "/mercadopago/notification",
+      external_reference: id,
     };
 
     mercadopago.preferences.create(preference).then(function(response){
