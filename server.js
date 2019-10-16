@@ -180,6 +180,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/mercadopago/notification', function (req, res) { 
     console.log("1")
+    res.sendStatus(200)
+    console.log("calling: " + 'https://api.mercadopago.com/v1/payments/' + req.body.id + '?access_token=' + process.env.MP_TOKEN)
     axios.get('https://api.mercadopago.com/v1/payments/' + req.body.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
       console.log("2")
       db.collection('notifications').findOneAndUpdate(
@@ -194,7 +196,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         returnOriginal:false 
       }).then(function(doc){
         console.log("3")
-        res.sendStatus(200)
+        
         console.log("4")
         console.log(response.body.status)
         //if(response.body.status === 'approved'){
