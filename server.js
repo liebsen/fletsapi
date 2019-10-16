@@ -203,7 +203,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
             id:notification.value.external_reference
           },
           {
-            "$set": response.data
+            "$set": {
+              payment_status: notification.value.status
+            }
           },{ 
             upsert: true, 
             'new': true, 
@@ -214,23 +216,26 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
             console.log("5")
             console.log(notification.value.status)
             //if(response.body.status === 'approved'){
-              emailClient.send({
-                //to:'mafrith@gmail.com',
-                to:'telemagico@gmail.com',
-                subject:'Tenés un envío de FletsApp!',
-                data:{
-                  title:'Marina! Tenés un envío pendiente :' + notification.value.status,
-                  message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>'
-                  //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
-                  //linkText:'Ver el estado de mi envío'
-                },
-                templatePath:path.join(__dirname,'/email/template.html')
-              }).catch(function(err){
-                console.log("email error")
-                if(err) console.log(err)
-              })
+              
+            emailClient.send({
+              //to:'mafrith@gmail.com',
+              to:'telemagico@gmail.com',
+              subject:'Tenés un envío de FletsApp!',
+              data:{
+                title:'Marina! Tenés un envío pendiente :' + notification.value.status,
+                message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>'
+                //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
+                //linkText:'Ver el estado de mi envío'
+              },
+              templatePath:path.join(__dirname,'/email/template.html')
+            }).then(function(){
               console.log("6")
               res.sendStatus(200)
+            }).catch(function(err){
+              console.log("email error")
+              if(err) console.log(err)
+            })
+
               //}
           }).catch((err) => {
             return res.json(err)
