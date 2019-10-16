@@ -234,12 +234,12 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   app.get('/testfind', function (req, res) { 
 
     db.collection('notifications').find({id:5328939178}).toArray(function(err, doc) {
-      console.log("1")
-      console.log(doc)
+      console.log("A")
+      console.log(doc.length)
 
       db.collection('notifications').find({id:5328}).toArray(function(err, doc2) {
-        console.log("2")
-        console.log(doc2)
+        console.log("B")
+        console.log(doc2.length)
       })
     })
 
