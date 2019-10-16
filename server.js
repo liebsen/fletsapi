@@ -285,7 +285,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
                 returnOriginal:false 
               }).then(function(preference){
                 console.log("4")
-                console.log(preference.value.id)
+                console.log(preference.value)
                 console.log("5")
                 console.log(notification.value.status)
                 //if(response.body.status === 'approved'){
@@ -296,8 +296,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
                   subject:'Tenés un envío de FletsApp!',
                   data:{
                     title:'Marina! Tenés un envío pendiente :' + notification.value.status,
-                    message: 'This is a test message',
-                    //message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>'
+                    message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
                     link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
                     linkText:'Ver detalle del envío'
                   },
