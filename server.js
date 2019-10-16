@@ -247,8 +247,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/contact', function (req, res) {  
     emailClient.send({
-      //to:'mafrith@gmail.com',
-      to:'telemagico@gmail.com',
+      to:'mafrith@gmail.com',
+      //to:'telemagico@gmail.com',
       subject:'Contacto desde FletsApp',
       data:{
         title:'Contacto desde FletsApp',
