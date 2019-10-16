@@ -14,27 +14,25 @@ var _ = require('lodash');
 //   }
 // }
 var defaultSMTPConfig = {
-  host: 'smtp.sendgrid.net',
+  host: 'smtp.gmail.com',
   port: 587,
   auth: {
-    user: 'waaws',
-    pass: 'FhiFzXAkzhu[AXfE4GWTwrYH'
+    user: process.env.EMAIL_SMTP_USER,
+    pass: process.env.EMAIL_SMTP_PASS
   }
 }
 
 var defaultEmailConfig = {
-  from:'"Contacto" <marce@waaws.space>',
+  from:'"FletsApp" <no-reply@fletsapp.com>',
 	subject:'',
 	template:'',
   data:{}
 }
 
-
 var Client = function(config, emailsConfig){
   this.defaultEmailConfig = emailsConfig || defaultEmailConfig;
   this.transport = nodemailer.createTransport(config || defaultSMTPConfig);
 }
-
 
 Client.prototype.send = function (emailConfig) {
   var that = this;

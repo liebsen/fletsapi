@@ -14,9 +14,7 @@ var bodyParser = require('body-parser')
 const mercadopago = require ('mercadopago');
 var onlinewhen = moment().utc().subtract(10, 'minutes')
 var emailHelper = require('./email/helper')
-var emailClient = emailHelper(null,{
-  from:'"FletsApp" <no-reply@fletsapp.com>'
-})
+var emailClient = emailHelper()
 var gamesort = {date:-1}
 var allowedOrigins = [
   'http://localhost:4000',
@@ -184,7 +182,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       console.log("id: " + req.body.data.id)
       axios.get('https://api.mercadopago.com/v1/payments/' + req.body.data.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
         console.log("2")
-        console.log(response)
         db.collection('notifications').findOneAndUpdate(
         {
           id:response.data.id
