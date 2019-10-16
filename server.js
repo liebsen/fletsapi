@@ -154,6 +154,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         return res.json(response.body)
       })
     }).catch(function(error){
+      console.log("mercadopago error: ");
       console.log(error);
     });      
   })
@@ -225,6 +226,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
                 },
                 templatePath:path.join(__dirname,'/email/template.html')
               }).catch(function(err){
+                console.log("email error")
                 if(err) console.log(err)
               })
               console.log("6")
