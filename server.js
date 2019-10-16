@@ -124,7 +124,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/flet/preference', function (req, res) {  
     // Crea un objeto de preferencia
-    var id = random_code(10)
+    var id = random_code(32)
     let preference = {
       items: [
         {
@@ -143,7 +143,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     mercadopago.preferences.create(preference).then(function(response){
       db.collection('preferences').findOneAndUpdate(
       {
-        id:response.body.id
+        id:id
       },
       {
         "$set": req.body
@@ -177,7 +177,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       res.redirect(process.env.APP_URL + '/pago-completado/' + req.body.payment_status)
     })
   })
-
 
   app.get('/sendemail', function (req, res) {
     let transporter = nodeMailer.createTransport({
