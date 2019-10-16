@@ -192,7 +192,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         res.sendStatus(200)
         //if(response.body.status === 'approved'){
           emailClient.send({
-            to:'mafrith@gmail.com',
+            //to:'mafrith@gmail.com',
+            to:'telemagico@gmail.com',
             subject:'Tenés un envío de FletsApp!',
             data:{
               title:'Marina! Tenés un envío pendiente',
