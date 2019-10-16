@@ -290,7 +290,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
                 console.log(notification.value.status)
                 //if(response.body.status === 'approved'){
 
-                emailClient.send({
+                return emailClient.send({
                   //to:'mafrith@gmail.com',
                   to:'telemagico@gmail.com',
                   subject:'Tenés un envío de FletsApp!',
@@ -307,6 +307,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
                 }).catch(function(err){
                   console.log("email error")
                   if(err) console.log(err)
+                  res.sendStatus(200)
                 })
 
                   //}
@@ -323,6 +324,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           res.sendStatus(200)
         }
       })
+    } else {
+     res.sendStatus(200)
     }
   })  
 
