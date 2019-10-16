@@ -180,7 +180,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/mercadopago/notification', function (req, res) { 
-    axios.get( 'https://api.mercadopago.com/v1/payments/' + req.body.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
+    console.log("1")
+    axios.get('https://api.mercadopago.com/v1/payments/' + req.body.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
+      console.log("2")
       db.collection('notifications').findOneAndUpdate(
       {
         id:response.body.id
@@ -192,14 +194,17 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         'new': true, 
         returnOriginal:false 
       }).then(function(doc){
+        console.log("3")
         res.sendStatus(200)
+        console.log("4")
+        console.log(response.body.status)
         //if(response.body.status === 'approved'){
           emailClient.send({
             //to:'mafrith@gmail.com',
             to:'telemagico@gmail.com',
             subject:'Tenés un envío de FletsApp!',
             data:{
-              title:'Marina! Tenés un envío pendiente',
+              title:'Marina! Tenés un envío pendiente ' + response.body.status,
               message: 'Nombre: ' + preference.datos.nombre + '<br>Teléfono : ' + preference.datos.telefono + '<br>Pasar a buscar en: ' + preference.ruta.from.formatted_address + '<br>Entregar en : ' + preference.ruta.to.formatted_address + '<br>'
               //link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
               //linkText:'Ver el estado de mi envío'
