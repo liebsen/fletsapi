@@ -179,7 +179,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
 
-  app.post('/sendemail', function (req, res) {
+  app.get('/sendemail', function (req, res) {
     let transporter = nodeMailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
