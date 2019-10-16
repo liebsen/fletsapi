@@ -15,7 +15,9 @@ var _ = require('lodash');
 // }
 var defaultSMTPConfig = {
   host: 'smtp.gmail.com',
-  port: 587,
+  //port: 587,
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.EMAIL_SMTP_USER,
     pass: process.env.EMAIL_SMTP_PASS
@@ -39,11 +41,6 @@ Client.prototype.send = function (emailConfig) {
   if(!emailConfig) throw 'email config is required';
 
   emailConfig = _.defaults(emailConfig, this.defaultEmailConfig);
-
-  // Just for the backup smtp
-  if(defaultSMTPConfig.host == 'smtp-pulse.com'){
-    emailConfig.from = '"Website Email" <marce@waaws.space>';
-  }
 
   if(emailConfig.templatePath){
     emailConfig.template = fs.readFileSync(emailConfig.templatePath).toString();
