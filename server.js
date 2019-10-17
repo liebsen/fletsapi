@@ -116,12 +116,14 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let wpart = preference.weight.price + delta * preference.weight.karma;
     let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
 
-    req.body.estimate = {
-        amount: amount,
-        //amount: 10.00,
-        currency: 'ARS'
+    const estimate = {
+      amount: amount,
+      //amount: 10.00,
+      currency: 'ARS'
     }
-    
+
+    req.body.estimate = estimate
+
     db.collection('preferences').findOneAndUpdate(
     {
       id:id
@@ -137,11 +139,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       let data = {
         id: id,
         status: 'success',
-        estimate: {
-          amount: estimate,
-          //amount: 10.00,
-          currency: 'ARS'
-        }
+        estimate: estimate
       }
 
       return res.json(data)
