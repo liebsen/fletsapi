@@ -149,6 +149,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   app.post('/flet/preference', function (req, res) {  
     // Crea un objeto de preferencia
     db.collection('preferences').find({id:req.body.id}).toArray(function(err, result) {
+
+      console.log(result)
+      
       if(result.length && result.estimate.amount){
         let preference = {
           items: [
