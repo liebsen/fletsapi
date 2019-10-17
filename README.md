@@ -1,31 +1,29 @@
 # LiveChess API
 
-[![Latest Stable Version](https://ajedrezenvivo.net/img/knightpawn.png)](https://ajedrezenvivo.net)
+[![Latest Stable Version](https://fletsapp.herokuapp.com/assets/android-chrome-192x192.png)](https://fletsapp.herokuapp.com)
 
-## Transmisión en vivo de torneos de ajedrez
-### Tablero virtual para transmisión en vivo de torneos de ajedrez. Base de datos de partidas.
+## Llevalo y traelo al toque
+### Estamos en etapa beta todavía.
 
 ## Sobre este proyecto
-Este proyecto es puramente educacional y motivado, por parte de todos los integrantes de su equipo, por el amor que dedicamos a este singular deporte que es el ajedrez. AjedrezEV no recibe ningún tipo de aporte o inversión económica y no persigue ánimos de lucro. Debido a que este proyecto es voluntario, y se realiza con el tiempo que generosamente cada miembro del equipo puede aportar entonces no pide ni necesita de su colaboración ecónomica. Solo esperamos que sea útil y visualicen y carguen todas las partidas que deseen.
+FletsApp ofrece servicios de transporte de carga liviana por vía terrestre, con rápida recepción y entrega solicitadas, sin demoras.
 
-El código de este proyecto fue creado y es mantenido producto de un solo desarrollador y es totalmente ad honorem. Actualmente tiene un solo idioma, castellano porque pretende llegar a los nuevos entusiastas del ajedrez en Argentina y países hermanos de habla castellana. 
+Cumplimos con las normas establecidas por las autoridades del transporte nacional, ofreciendo a nuestros clientes la confianza de un servicio eficiente, competitivo y de calidad para que su carga viaje segura, llegue en buen estado y a tiempo.
 
-Existe la posibilidad de extender la aplicación a multi-idioma pero es necesaria la bondadosa colaboración de eventuales entusiastas.
+Contamos con unidad, con capacidad de 650 Kg de carga útil. Distribución de Volumen: Largo: 1,40 mts, Ancho: 1,29 m x Altura: 1,34 m. Con su sistema de amarres y seguro de Transporte de Bienes.
 
-Si estas interesado en participar de este proyecto puedes [solicitarlo aquí](mailto:overlemonsoft@gmail.com?Subject=Hola, Quiero colaborar con el proyecto AjedrezEV).
+Buscamos con todo esto lograr el prestigio y el liderazgo en este segmento del transporte automotor, para continuar ofreciendo las mejores posibilidades del mercado.
+
+Si estas interesado en participar de este proyecto puedes [solicitarlo aquí](mailto:fletsappmailer@gmail.com?Subject=Hola, Quiero colaborar con el proyecto FletsApp).
 
 ## Equipo
-- 👨🏻‍ ‍Martín Frith - 🌎 Esquel
-- ‍👨🏻‍ ‍Cristhian Daher - 🌎 Esquel
-
-## Agradecimientos
-Un especial agradecimiento a [Jeff Hlywa](https://github.com/jhlywa) de [chess.js](https://github.com/jhlywa/chess.js) y a [Chris Oakman](https://github.com/oakmac) de [chessboard.js](https://github.com/oakmac/chessboardjs), como así también a todo su equipo de desarrollo por su contribución al render y al motor de juego. 
+- ‍👩‍ Marina Frith - CEO 🌎 Baires 
+- 👨‍ ‍Martín Frith - CTO 🌎 Esquel
 
 ## ChangeLog
-- 2019.4.2 Versión 0.1  Inicio del proyecto — Visualización de partidas online.
-- 2019.4.4 Versión 0.11 — Capa de datos persistente. Posibilidad de guardar partidas.
-- 2019.4.6 Versión 0.111 — Detalle completo de partidas.
-- 2019.4.9 Versión 0.2 — Modo nocturno. Noticación sonora de movimiento. Resaltar último movimiento.
-- 2019.4.11 Versión 0.3 — Partidas Online. Formulario de búsqueda de partidas por jugador, lugar o evento.
-- 2019.4.13 Versión 0.4 — Código de seguridad que garantiza la privacidad de las mesas siendo emitidas. Vista de resultados completos.
-- 2019.5.18 Versión 0.5 — Vista de partida con índice de movimientos. Se cargan 3300 partidas históricas de chess-db.com.
+- 2019.10.2 Versión 0.1  Inicio del proyecto — Layout.
+- 2019.10.6 Versión 0.2 — Capa de datos persistente. Posibilidad de visualizar mapas.
+- 2019.10.10 Versión 0.3 — Implementación de Mapbox, Google Places API & Google Directions API.
+- 2019.10.13 Versión 0.4 — Asistente 
+- 2019.10.15 Versión 0.5 — Implementación de Mercadopago
+- 2019.10.16 Versión 0.4 — Lanzamiento v1
