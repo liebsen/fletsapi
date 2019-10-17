@@ -474,7 +474,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.get('/panel/preferencias', function (req, res) { 
     db.collection('preferences').find({payment_status:null}).toArray(function(err, data) {
-      console.log(data)
       res.render('preferencias',{data: data})
     })
   })

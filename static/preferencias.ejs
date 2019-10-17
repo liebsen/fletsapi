@@ -16,10 +16,20 @@
 
 <% }else{ %>
 
-<ul>
+<div class="columns is-multiline">
     <% data.forEach(function(flet) { %>
-        <li><%= flet.datos.nombre %> - <%= flet.ruta.distance.text %></li>
+	<div class="column has-background-success">
+		<span class="has-text-white is-size-3"><%= flet.datos.nombre %></span><br>
+		<span class="has-text-white is-size-6"><%= flet.datos.telefono %></span><br>
+		<span class="has-text-white is-size-4"><%= flet.estimate.amount %> <%= flet.estimate.currency %></span><br>
+		<span class="has-text-white is-size-6"><%= flet.ruta.from.formatted_address %></span>
+		<span class="fas fa-hand-point-right"></span>
+		<span class="has-text-white is-size-6"><%= flet.ruta.to.formatted_address %></span><br>
+		<span class="has-text-white is-size-4"><%= flet.ruta.distance.text %></span>
+		<span class="has-text-white is-size-4"><%= flet.ruta.duration.text %></span>
+		<span class="has-text-warning is-size-5"><%= flet.ruta.payment_status %></span>
+	</div>
     <% }); %>
-</ul>
+</div>
 
 <% } %>
