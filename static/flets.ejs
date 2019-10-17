@@ -12,14 +12,24 @@
 
 <% if(!data.length){ %>
 
-<h6>No hay flets todavía. Esperemos un poco mas!</h6>
+<h6>No hay items todavía. Esperemos un poco mas!</h6>
 
 <% }else{ %>
 
-<ul>
-    <% data.forEach(function(flet) { %>
-        <li><%= flet.datos.nombre %> - <%= flet.ruta.distance.text %></li>
+<div class="columns is-multiline">
+    <% data.forEach(function(item) { %>
+	<div class="column has-background-light">
+		<span class="has-text-dark is-size-3"><%= item.datos.nombre %></span><br>
+		<a href="tel:<%= item.datos.telefono %>"><span class="has-text-dark is-size-6"><%= item.datos.telefono %></span></a><br>
+		<span class="has-text-dark is-size-3"><%= item.estimate.amount %> <%= item.estimate.currency %></span><br>
+		<span class="has-text-dark is-size-4"><%= item.ruta.distance.text %></span>
+		<span class="has-text-dark is-size-4"><%= item.ruta.duration.text %></span><br>
+		<span class="has-text-dark is-size-6"><%= item.ruta.from.formatted_address %></span>&nbsp;
+		<span class="fas fa-hand-point-right has-text-dark"></span>&nbsp;
+		<span class="has-text-dark is-size-6"><%= item.ruta.to.formatted_address %></span><br>
+		<span class="has-text-warning is-size-5"><%= item.ruta.payment_status %></span>
+	</div>
     <% }); %>
-</ul>
+</div>
 
 <% } %>

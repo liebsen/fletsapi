@@ -16,10 +16,12 @@
 
 <% }else{ %>
 
-<ul>
-    <% data.forEach(function(flet) { %>
-        <li><%= flet.datos.nombre %> - <%= flet.ruta.distance.text %></li>
+<div class="columns is-multiline">
+    <% data.forEach(function(item) { %>
+	<div class="column has-background-light">
+		<span class="has-text-dark is-size-3"><%= item.status %></span><br>
+	</div>
     <% }); %>
-</ul>
+</div>
 
 <% } %>
