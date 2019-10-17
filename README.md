@@ -16,8 +16,8 @@ Buscamos con todo esto lograr el prestigio y el liderazgo en este segmento del t
 Si estas interesado en participar de este proyecto puedes [solicitarlo aquí](mailto:fletsappmailer@gmail.com?Subject=Hola, Quiero colaborar con el proyecto FletsApp).
 
 ## Equipo
-- ‍👩‍ Marina Frith - CEO 🌎 Baires 
-- 👨‍ ‍Martín Frith - CTO 🌎 Esquel
+- ‍👩‍ Marina Frith - CEO 🌎 Buenos Aires 
+- 👨🏻‍ ‍ ‍Martín Frith - CTO 🌎 Esquel
 
 ## ChangeLog
 - 2019.10.02 Versión 0.1  Inicio del proyecto — Layout.
