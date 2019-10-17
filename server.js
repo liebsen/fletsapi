@@ -76,6 +76,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     // calculo manual de cotizacion
     // todo : hacerlo dinamico para plataforma
 
+    var id = random_code(32)
+
     const preference = {
       distance: {
         basic: 20, // Distancia básica en kms
@@ -112,23 +114,47 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     }
 
     let wpart = preference.weight.price + delta * preference.weight.karma;
-    let estimate = parseFloat(Math.round(dpart + wpart)).toFixed(2);
-    let data = {
-      status: 'success',
-      amount: estimate,
-      //amount: 10.00,
-      currency: 'ARS'
+    let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
+
+    req.body.estimate = {
+        amount: amount,
+        //amount: 10.00,
+        currency: 'ARS'
     }
-    return res.json(data)
+    
+    db.collection('preferences').findOneAndUpdate(
+    {
+      id:id
+    },
+    {
+      "$set": req.body
+    },{ 
+      upsert: true, 
+      'new': true, 
+      returnOriginal:false 
+    }).then(function(preference){
+
+      let data = {
+        id: id,
+        status: 'success',
+        estimate: {
+          amount: estimate,
+          //amount: 10.00,
+          currency: 'ARS'
+        }
+      }
+
+      return res.json(data)
+    })
   })
 
   app.post('/flet/preference', function (req, res) {  
     // Crea un objeto de preferencia
-    var id = random_code(32)
+    
     let preference = {
       items: [
         {
-          id: id,
+          id: req.body.id,
           title: 'Envío con FletsApp',
           description: "",
           unit_price: parseFloat(req.body.estimate.amount),
@@ -137,23 +163,11 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         }
       ],
       notification_url: req.protocol + '://' + req.get('host') + "/mercadopago/notification",
-      external_reference: id,
+      external_reference: req.body.id
     };
 
     mercadopago.preferences.create(preference).then(function(response){
-      db.collection('preferences').findOneAndUpdate(
-      {
-        id:id
-      },
-      {
-        "$set": req.body
-      },{ 
-        upsert: true, 
-        'new': true, 
-        returnOriginal:false 
-      }).then(function(){
-        return res.json(response.body)
-      })
+      return res.json(response.body)
     }).catch(function(error){
       console.log("mercadopago error: ");
       console.log(error);
