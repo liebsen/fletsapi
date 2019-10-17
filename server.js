@@ -452,21 +452,22 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
       var approved = 0
       var rejected = 0
-      const total = data.length
+      var preferences = 0
 
-      data.forEach((pref) => {
-        if(pref.payment_status === 'approved'){
+      data.forEach((preference) => {
+        if(preference.payment_status === 'approved'){
           approved++
-        }
-
-        if(pref.payment_status === 'rejected'){
+        } else if(preference.payment_status === 'rejected'){
           rejected++
+        } else if(!preference.payment_status){
+          preferences++
+        } else {
         }
       })
       res.render('panel',{
         approved: approved,
         rejected: rejected,
-        total: total
+        preferences: preferences
       })
     })
   })
