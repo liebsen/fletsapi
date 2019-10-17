@@ -117,8 +117,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
 
     const estimate = {
-      amount: amount,
-      //amount: 10.00,
+      //amount: amount,
+      amount: 10.00,
       currency: 'ARS'
     }
 
@@ -148,28 +148,35 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/flet/preference', function (req, res) {  
     // Crea un objeto de preferencia
-    
-    let preference = {
-      items: [
-        {
-          id: req.body.id,
-          title: 'Envío con FletsApp',
-          description: "",
-          unit_price: parseFloat(req.body.estimate.amount),
-          currency_id: "ARS",
-          quantity: 1,
-        }
-      ],
-      notification_url: req.protocol + '://' + req.get('host') + "/mercadopago/notification",
-      external_reference: req.body.id
-    };
+    db.collection('preferences').find({id:req.body.id}).toArray(function(err, result) {
+      if(result.length && result.estimate.amount){
+        let preference = {
+          items: [
+            {
+              id: req.body.id,
+              title: 'Envío con FletsApp',
+              description: "",
+              unit_price: parseFloat(result.estimate.amount),
+              currency_id: "ARS",
+              quantity: 1
+            }
+          ],
+          notification_url: req.protocol + '://' + req.get('host') + "/mercadopago/notification",
+          external_reference: req.body.id
+        };
 
-    mercadopago.preferences.create(preference).then(function(response){
-      return res.json(response.body)
-    }).catch(function(error){
-      console.log("mercadopago error: ");
-      console.log(error);
-    });      
+        mercadopago.preferences.create(preference).then(function(response){
+          return res.json(response.body)
+        }).catch(function(error){
+          console.log("mercadopago error: ");
+          console.log(error);
+        })
+      } else {
+        return res.json({
+          status: 'error'
+        })
+      }
+    })
   })
 
   app.post('/procesar-pago', function (req, res) { 

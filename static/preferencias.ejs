@@ -4,18 +4,6 @@
 
 <%- contentFor('js') %>
 
-<script>
-
-	document.addEventListener('DOMContentLoaded', function () {
-		document.querySelectorAll('.convert-date').forEach(function(el){
-			const timestamp = el.innerText.toString().substring(0,8)
-			const date = new Date( parseInt( timestamp, 16 ) * 1000 )
-			el.innerHTML = date
-		})
-	})
-</script>
-
-
 <%- contentFor('content') %>
 
 <% include ./header %>
@@ -32,7 +20,7 @@
     <% data.forEach(function(item) { %>
 	<div class="column has-background-light">
 		<span class="has-text-info is-size-6 convert-date"><%= item._id %></span><br>
-		<span class="has-text-dark is-size-3"><%= item.datos.nombre %></span><br>
+		<span class="has-text-dark is-size-4"><%= item.datos.nombre %></span><br>
 		<a href="tel:<%= item.datos.telefono %>"><span class="has-text-dark is-size-6"><%= item.datos.telefono %></span></a><br>
 		<span class="has-text-dark is-size-3"><%= item.estimate.amount %> <%= item.estimate.currency %></span><br>
 		<span class="has-text-dark is-size-4"><%= item.ruta.distance.text %></span>
