@@ -1,0 +1,25 @@
+<%- contentFor('css') %>
+
+<title>Pagos</title>
+
+<%- contentFor('js') %>
+
+<%- contentFor('content') %>
+
+<% include ./header %>
+
+<h2>Pagos</h2>
+
+<% if(!data.length){ %>
+
+<h6>No hay pagos todavía. Esperemos un poco mas!</h6>
+
+<% }else{ %>
+
+<ul>
+    <% data.forEach(function(flet) { %>
+        <li><%= flet.datos.nombre %> - <%= flet.ruta.distance.text %></li>
+    <% }); %>
+</ul>
+
+<% } %>

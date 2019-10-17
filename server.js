@@ -439,6 +439,52 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
+
+  // admin panel. todo: add auth
+
+  app.get('/panel', function (req, res) { 
+    db.collection('preferences').find({}).toArray(function(err, data) {
+
+      var approved = 0
+      var rejected = 0
+      const total = data.length
+
+      data.forEach((pref) => {
+        if(pref.payment_status === 'approved'){
+          approved++
+        }
+
+        if(pref.payment_status === 'rejected'){
+          rejected++
+        }
+      })
+      res.render('panel',{
+        approved: approved,
+        rejected: rejected,
+        total: total
+      })
+    })
+  })
+
+  app.get('/panel/flets', function (req, res) { 
+    db.collection('preferences').find({payment_status:{$ne:null}}).toArray(function(err, data) {
+      res.render('flets',{data: data})
+    })
+  })
+
+  app.get('/panel/preferencias', function (req, res) { 
+    db.collection('preferences').find({payment_status:null}).toArray(function(err, data) {
+      console.log(data)
+      res.render('preferencias',{data: data})
+    })
+  })
+
+  app.get('/panel/pagos', function (req, res) { 
+    db.collection('notifications').find({}).toArray(function(err, data) {
+      res.render('pagos',{data: data})
+    })
+  })
+
   app.post('/loadpgn', function (req, res) {
     if(!req.body.room) return res.json({'error':'no_room_provided'})
     db.collection('games').findOneAndUpdate(

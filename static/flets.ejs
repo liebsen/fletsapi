@@ -1,0 +1,25 @@
+<%- contentFor('css') %>
+
+<title>Flets</title>
+
+<%- contentFor('js') %>
+
+<%- contentFor('content') %>
+
+<% include ./header %>
+
+<h2>Flets</h2>
+
+<% if(!data.length){ %>
+
+<h6>No hay flets todavía. Esperemos un poco mas!</h6>
+
+<% }else{ %>
+
+<ul>
+    <% data.forEach(function(flet) { %>
+        <li><%= flet.datos.nombre %> - <%= flet.ruta.distance.text %></li>
+    <% }); %>
+</ul>
+
+<% } %>
