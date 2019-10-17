@@ -117,8 +117,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
 
     const estimate = {
-      amount: amount,
-      //amount: 10.00,
+      //amount: amount,
+      amount: 10.00,
       currency: 'ARS'
     }
 
@@ -180,21 +180,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/procesar-pago', function (req, res) { 
-    db.collection('preferences').findOneAndUpdate(
-    {
-      id:req.body.preference_id
-    },
-    {
-      "$set": {
-        payment: req.body
-      }
-    },{ 
-      upsert: true, 
-      'new': true, 
-      returnOriginal:false 
-    }).then(function(preference){
-      res.redirect(process.env.APP_URL + '/pago-completado/' + req.body.payment_status)
-    })
+    res.redirect(process.env.APP_URL + '/pago-completado/' + req.body.payment_status)
   })
 
   app.post('/mercadopago/notification', function (req, res) { 
