@@ -1,12 +1,11 @@
-# LiveChess API
+# FletsApp API
 
 [![Latest Stable Version](https://fletsapp.herokuapp.com/assets/android-chrome-192x192.png)](https://fletsapp.herokuapp.com)
 
 ## Llevalo y traelo al toque
-### Estamos en etapa beta todavía.
+### FletsApp ofrece servicios de transporte de carga liviana por vía terrestre, con rápida recepción y entrega solicitadas, sin demoras.
 
 ## Sobre este proyecto
-FletsApp ofrece servicios de transporte de carga liviana por vía terrestre, con rápida recepción y entrega solicitadas, sin demoras.
 
 Cumplimos con las normas establecidas por las autoridades del transporte nacional, ofreciendo a nuestros clientes la confianza de un servicio eficiente, competitivo y de calidad para que su carga viaje segura, llegue en buen estado y a tiempo.
 
@@ -21,9 +20,10 @@ Si estas interesado en participar de este proyecto puedes [solicitarlo aquí](ma
 - 👨‍ ‍Martín Frith - CTO 🌎 Esquel
 
 ## ChangeLog
-- 2019.10.2 Versión 0.1  Inicio del proyecto — Layout.
-- 2019.10.6 Versión 0.2 — Capa de datos persistente. Posibilidad de visualizar mapas.
+- 2019.10.02 Versión 0.1  Inicio del proyecto — Layout.
+- 2019.10.06 Versión 0.2 — Capa de datos persistente. Posibilidad de visualizar mapas.
 - 2019.10.10 Versión 0.3 — Implementación de Mapbox, Google Places API & Google Directions API.
-- 2019.10.13 Versión 0.4 — Asistente 
-- 2019.10.15 Versión 0.5 — Implementación de Mercadopago
-- 2019.10.16 Versión 0.4 — Lanzamiento v1
+- 2019.10.12 Versión 0.4 — Asistente 
+- 2019.10.14 Versión 0.5 — Implementación de Mercadopago
+- 2019.10.15 Versión 0.9 — Integración y Testing
+- 2019.10.16 Versión 1.0 — Lanzamiento v1
