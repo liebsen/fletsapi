@@ -150,8 +150,11 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     // Crea un objeto de preferencia
     db.collection('preferences').find({id:req.body.id}).toArray(function(err, result) {
 
-      console.log(result)
-      
+
+      console.log("1")
+      console.log(result.estimate)
+      console.log(result.estimate.amount)
+
       if(result.length && result.estimate.amount){
         let preference = {
           items: [
