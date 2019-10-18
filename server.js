@@ -16,7 +16,6 @@ var onlinewhen = moment().utc().subtract(10, 'minutes')
 var emailHelper = require('./email/helper')
 var emailClient = emailHelper()
 var nodeMailer = require('nodemailer')
-var gamesort = {date:-1}
 var allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
@@ -298,45 +297,35 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   // admin panel. todo: add auth
 
   app.get('/panel', function (req, res) { 
-    db.collection('preferences').find({}).toArray(function(err, data) {
-
-      var approved = 0
-      var rejected = 0
-
-      data.forEach((preference) => {
-        if(preference.mercadopago){
-          if(preference.mercadopago.status === 'approved'){
-            approved++
-          } else if(preference.mercadopago.status === 'rejected'){
-            rejected++
-          } else {
-          }
-        }
-      })
-
-      res.render('panel',{
-        approved: approved,
-        rejected: rejected,
-        preferences: data.length
-      })
-    })
+    res.render('panel')
   })
 
   app.get('/panel/flets', function (req, res) { 
-    db.collection('preferences').find({mercadopago:{$ne:null}}).toArray(function(err, data) {
-      res.render('flets',{data: data})
-    })
+    res.render('flets')
   })
 
   app.get('/panel/preferencias', function (req, res) { 
-    db.collection('preferences').find({}).toArray(function(err, data) {
-      res.render('preferencias',{data: data})
-    })
+    res.render('preferencias')
   })
 
   app.get('/panel/pagos', function (req, res) { 
-    db.collection('preferences').find({mercadopago:{$ne:null}}).toArray(function(err, data) {
-      res.render('pagos',{data: data})
+    res.render('pagos')
+  })
+
+  app.post('/panel/search', function (req, res) { 
+    if(!req.body) return res.json({'error':'not_enough_params'})
+    var body = JSON.parse(req.body.data)
+    , limit = parseInt(body.limit)||50
+    , offset = parseInt(body.offset)||0
+    console.log(body)
+    db.collection('preferences').countDocuments(body.find, function(error, numOfResults){
+      db.collection('preferences').find(body.find)
+        .sort({_id:-1})
+        .limit(limit)
+        .skip(offset)
+        .toArray(function(err,results){
+          return res.json({results:results,count:numOfResults})
+        })   
     })
   })
 
