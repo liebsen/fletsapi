@@ -115,8 +115,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
 
     const estimate = {
-      amount: amount,
-      //amount: 10.00,
+      //amount: amount,
+      amount: 10.00,
       currency: 'ARS'
     }
 
@@ -185,10 +185,14 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           'new': true, 
           returnOriginal:false 
         }).then(function(preference){
+          console.log('------------------------')
+          console.log(preference.value)
+          console.log(preference.mercadopago.status)
+          console.log(response.data)
           if(preference.value.mercadopago.status === 'approved'){
             emailClient.send({
-              to:'mafrith@gmail.com',
-              //to:'telemagico@gmail.com',
+              //to:'mafrith@gmail.com',
+              to:'telemagico@gmail.com',
               subject:'Tenés un envío de FletsApp',
               data:{
                 title:'Marina: Te salió un envío!',
@@ -301,40 +305,40 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
       var approved = 0
       var rejected = 0
-      var preferences = 0
 
       data.forEach((preference) => {
-        if(preference.payment_status === 'approved'){
-          approved++
-        } else if(preference.payment_status === 'rejected'){
-          rejected++
-        } else if(!preference.payment_status){
-          preferences++
-        } else {
+        if(preference.mercadopago){
+          if(preference.mercadopago.status === 'approved'){
+            approved++
+          } else if(preference.mercadopago.status === 'rejected'){
+            rejected++
+          } else {
+          }
         }
       })
+
       res.render('panel',{
         approved: approved,
         rejected: rejected,
-        preferences: preferences
+        preferences: data.length
       })
     })
   })
 
   app.get('/panel/flets', function (req, res) { 
-    db.collection('preferences').find({payment_status:{$ne:null}}).toArray(function(err, data) {
+    db.collection('preferences').find({mercadopago:{$ne:null}}).toArray(function(err, data) {
       res.render('flets',{data: data})
     })
   })
 
   app.get('/panel/preferencias', function (req, res) { 
-    db.collection('preferences').find({payment_status:null}).toArray(function(err, data) {
+    db.collection('preferences').find({}).toArray(function(err, data) {
       res.render('preferencias',{data: data})
     })
   })
 
   app.get('/panel/pagos', function (req, res) { 
-    db.collection('notifications').find({}).toArray(function(err, data) {
+    db.collection('preferences').find({mercadopago:{$ne:null}}).toArray(function(err, data) {
       res.render('pagos',{data: data})
     })
   })
