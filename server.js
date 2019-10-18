@@ -168,54 +168,45 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/mercadopago/notification', function (req, res) { 
-    console.log(req.body)
-    
     if(req.body.data){
-      // check if notification exists
-      db.collection('preferences').find({payment_id:req.body.data.id}).toArray(function(err, result) {
-        if(result.length === 0){
-          axios.get('https://api.mercadopago.com/v1/payments/' + req.body.data.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
-            db.collection('preferences').findAndModify(
-            {
-              payment_id:req.body.data.id
-            },
-            {
-              "$set": {
-                mercadopago : response.data
-              }
-            },{ 
-              upsert: true, 
-              'new': true, 
-              returnOriginal:false 
-            }).then(function(preference){
-              if(preference.value.mercadopago.status === 'approved'){
-                emailClient.send({
-                  //to:'mafrith@gmail.com',
-                  to:'telemagico@gmail.com',
-                  subject:'Tenés un envío de FletsApp',
-                  data:{
-                    title:'Marina: Te salió un envío!',
-                    message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
-                    link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
-                    linkText:'Ver detalle del envío'
-                  },
-                  templatePath:path.join(__dirname,'/email/template.html')
-                }).then(function(){
-                  res.sendStatus(200)
-                }).catch(function(err){
-                  if(err) console.log(err)
-                  res.sendStatus(200)
-                })
-              }
-            }).catch((err) => {
-              return res.json(err)
+      axios.get('https://api.mercadopago.com/v1/payments/' + req.body.data.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
+        // check if notification exists
+        var ObjectId = require('mongodb').ObjectId; 
+        db.collection('preferences').findOneAndUpdate(
+        {
+          '_id': new ObjectId(response.data.external_reference)
+        },
+        {
+          "$set": {
+            mercadopago : response.data
+          }
+        },{ 
+          upsert: true, 
+          'new': true, 
+          returnOriginal:false 
+        }).then(function(preference){
+          if(preference.value.mercadopago.status === 'approved'){
+            emailClient.send({
+              //to:'mafrith@gmail.com',
+              to:'telemagico@gmail.com',
+              subject:'Tenés un envío de FletsApp',
+              data:{
+                title:'Marina: Te salió un envío!',
+                message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
+                link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
+                linkText:'Ver detalle del envío'
+              },
+              templatePath:path.join(__dirname,'/email/template.html')
+            }).then(function(){
+              res.sendStatus(200)
+            }).catch(function(err){
+              if(err) console.log(err)
+              res.sendStatus(200)
             })
-          }).catch((err) => {
-            return res.json(err)
-          })
-        } else {
-          res.sendStatus(200)
-        }
+          }
+        }).catch((err) => {
+          return res.json(err)
+        })
       })
     } else {
      res.sendStatus(200)
