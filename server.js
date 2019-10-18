@@ -76,8 +76,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     // calculo manual de cotizacion
     // todo : hacerlo dinamico para plataforma
 
-    var id = random_code(32)
-
     const preference = {
       distance: {
         basic: 20, // Distancia básica en kms
@@ -117,27 +115,16 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
 
     const estimate = {
-      amount: amount,
-      //amount: 10.00,
+      //amount: amount,
+      amount: 10.00,
       currency: 'ARS'
     }
 
     req.body.estimate = estimate
 
-    db.collection('preferences').findOneAndUpdate(
-    {
-      id:id
-    },
-    {
-      "$set": req.body
-    },{ 
-      upsert: true, 
-      'new': true, 
-      returnOriginal:false 
-    }).then(function(preference){
-
+    db.collection('preferences').insertOne(req.body, function(err,doc){
       let data = {
-        id: id,
+        id: doc.insertedId,
         status: 'success',
         estimate: estimate
       }
@@ -148,7 +135,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/flet/preference', function (req, res) {  
     // Crea un objeto de preferencia
-    db.collection('preferences').find({id:req.body.id}).toArray(function(err, results) {
+    db.collection('preferences').find({_id:req.body.id}).toArray(function(err, results) {
       if(results.length && results[0].estimate.amount){
         let preference = {
           items: [
@@ -179,62 +166,44 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
-  app.post('/procesar-pago', function (req, res) { 
-    res.redirect(process.env.APP_URL + '/pago-completado/' + req.body.payment_status)
-  })
-
   app.post('/mercadopago/notification', function (req, res) { 
     if(req.body.data){
       // check if notification exists
-      db.collection('notifications').find({id:req.body.data.id}).toArray(function(err, result) {
+      db.collection('preferences').find({payment_id:req.body.data.id}).toArray(function(err, result) {
         if(result.length === 0){
           axios.get('https://api.mercadopago.com/v1/payments/' + req.body.data.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
-            db.collection('notifications').findOneAndUpdate(
+            db.collection('preferences').findOneAndUpdate(
             {
-              id:response.data.id
+              payment_id:req.body.data.id
             },
             {
-              "$set": response.data
+              "$set": {
+                mercadopago : response.data
+              }
             },{ 
               upsert: true, 
               'new': true, 
               returnOriginal:false 
-            }).then(function(notification){
-              db.collection('preferences').findOneAndUpdate(
-              {
-                id:notification.value.external_reference
-              },
-              {
-                "$set": {
-                  payment_status: notification.value.status
-                }
-              },{ 
-                upsert: true, 
-                'new': true, 
-                returnOriginal:false 
-              }).then(function(preference){
-                if(notification.value.status === 'approved'){
-                  emailClient.send({
-                    to:'mafrith@gmail.com',
-                    //to:'telemagico@gmail.com',
-                    subject:'Tenés un envío de FletsApp',
-                    data:{
-                      title:'Marina: Te salió un envío!',
-                      message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
-                      link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
-                      linkText:'Ver detalle del envío'
-                    },
-                    templatePath:path.join(__dirname,'/email/template.html')
-                  }).then(function(){
-                    res.sendStatus(200)
-                  }).catch(function(err){
-                    if(err) console.log(err)
-                    res.sendStatus(200)
-                  })
-                }
-              }).catch((err) => {
-                return res.json(err)
-              })
+            }).then(function(preference){
+              if(preference.value.mercadopago.status === 'approved'){
+                emailClient.send({
+                  //to:'mafrith@gmail.com',
+                  to:'telemagico@gmail.com',
+                  subject:'Tenés un envío de FletsApp',
+                  data:{
+                    title:'Marina: Te salió un envío!',
+                    message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
+                    link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
+                    linkText:'Ver detalle del envío'
+                  },
+                  templatePath:path.join(__dirname,'/email/template.html')
+                }).then(function(){
+                  res.sendStatus(200)
+                }).catch(function(err){
+                  if(err) console.log(err)
+                  res.sendStatus(200)
+                })
+              }
             }).catch((err) => {
               return res.json(err)
             })
@@ -249,6 +218,10 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
      res.sendStatus(200)
     }
   })  
+
+  app.post('/procesar-pago', function (req, res) { 
+    res.redirect(process.env.APP_URL + '/pago-completado/' + req.body.payment_status)
+  })
 
   app.post('/contact', function (req, res) {  
     emailClient.send({
@@ -326,124 +299,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     });
   });
 
-  app.post('/flet/create', function (req, res) { 
-    const room = random_code(16)
-    db.collection('flets').find({room:room}).toArray(function(err,doc){
-      if(!doc.length){
-        const secret_room = random_code(16)
-        db.collection('flets').findOneAndUpdate(
-        {
-          room:room
-        },
-        {
-          "$set": {
-            room:room,
-            secret_room:secret_room,
-            date:moment().utc().format('YYYY.MM.DD'),
-            event: 'Online game',
-            views: 1
-          }
-        },{ 
-          upsert: true, 
-          'new': true, 
-          returnOriginal:false 
-        }).then(function(doc){
-          return res.json({ 
-            status : 'success', 
-            secret_room:secret_room, 
-            room: room
-          })
-        })
-      } else {
-        return res.json({ status : 'danger', message : 'cannot_create_room_twice'})
-      }
-    })
-  });
-
-  app.get('/flet/:secret/:room', function (req, res) { 
-    if(!req.params.secret||!req.params.room) return res.json({status:'error',message:'not_enough_params'})
-    db.collection('games').findOneAndUpdate(
-    {
-      room:req.params.room
-    },
-    {
-      "$set": {
-        room:req.params.room,
-        secret_room:req.params.secret
-      }
-    },{ 
-      upsert: true, 
-      'new': true, 
-      returnOriginal:false 
-    }).then(function(){
-      res.json({status:'success'})
-    })
-  });
-
-  app.post('/flet', function (req, res) { 
-    db.collection('games').find(req.body).toArray(function(err,docs){
-      var game = {}
-      if(docs[0]){
-        game = docs[0]
-        delete game.secret_room 
-        delete game.live_url 
-      }
-      return res.json(game)
-    })   
-  })
-
-  app.post('/topten', function (req, res) { 
-    var $or = []
-    , limit = 3
-    , offset = 0
-
-    for(var i in req.body){
-      $or.push({'black': {'$regex' : req.body[i], '$options' : 'i'}})  
-      $or.push({'white': {'$regex' : req.body[i], '$options' : 'i'}})  
-    }
-
-    db.collection('games').find({"$or": $or})
-    .sort(gamesort)
-    .limit(limit)
-    .skip(offset)
-    .toArray(function(err,docs){
-      return res.json(docs)
-    })   
-  })
-
-  app.post('/fletcount', function (req, res) { 
-    db.collection('games').find(req.body).toArray(function(err,docs){
-      return res.json(docs.length)
-    })
-  })
-
-  app.post('/search', function (req, res) { 
-    if(!req.body.query) return res.json({'error':'not_enough_params'})
-    var $or = []
-    , limit = parseInt(req.body.limit)||25
-    , offset = parseInt(req.body.offset)||0
-    , query = unescape(req.body.query)
-
-    query.split(' ').forEach((word) => {
-      $or.push({"white": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"black": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"event": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"site": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"date": {'$regex' : word, '$options' : 'i'}})
-      $or.push({"pgn": {'$regex' : word, '$options' : 'i'}})
-    })
-
-    db.collection('games').countDocuments({"$or": $or}, function(error, numOfDocs){
-      db.collection('games').find({"$or": $or})
-        .sort(gamesort)
-        .limit(limit)
-        .skip(offset)
-        .toArray(function(err,docs){
-          return res.json({games:docs,count:numOfDocs})
-        })   
-    })
-  })
-
 
   // admin panel. todo: add auth
 
@@ -489,97 +344,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       res.render('pagos',{data: data})
     })
   })
-
-  app.post('/loadpgn', function (req, res) {
-    if(!req.body.room) return res.json({'error':'no_room_provided'})
-    db.collection('games').findOneAndUpdate(
-    {
-      room: req.body.room
-    },
-    {
-      "$set": req.body
-    },{ upsert: true, 'new': true, returnOriginal:false }).then(function(doc){
-      return res.json({ success: 1 })
-    })    
-  })
-
-  app.get('*', function (req, res) { 
-    const pathurl = [path.join(__dirname, 'static'),req.path+'.ejs'].join('')
-    const pathname = req.path.split('/').join('')
-    const query = req.query
-    fs.stat(pathurl, function(err, stat) {
-      if(err == null) {
-        res.render(pathname,{query: query})
-      } else {
-        db.collection('games').findOneAndUpdate(
-        {
-          room:pathname
-        },
-        {
-          "$inc": {
-            views : 1
-          }
-        },{ upsert: false, new: true }).then(function(doc){
-          if(doc.value){
-            if(doc.value.updatedAt && doc.value.broadcast && moment(doc.value.updatedAt).format('x') > onlinewhen.format('x')) {
-              res.json({status:'success',render:'watch',game:doc.value})
-            } else {
-              res.json({status:'success',render:'game',game:doc.value})
-            }
-          } else {
-            res.json({status:'error'})
-          }
-        })
-      }
-    });
-  })
-
-  io.on('connection', function(socket){ //join room on connect
-    socket.on('join', function(room) {
-      socket.join(room);
-      console.log('user joined room: ' + room);
-    });
-
-    socket.on('move', function(move) { //move object emitter
-      var moveObj = move
-      moveObj.updatedAt = moment().utc().format()
-      return db.collection('games').findOneAndUpdate(
-      {
-        room:moveObj.room
-      },
-      {
-        "$set": moveObj
-      },{ new: true }).then(function(doc){
-        console.log(moveObj.room + '- user moved: ' + JSON.stringify(move));
-        io.emit('move', move);
-      })
-    });
-
-    socket.on('data', function(data) { //move object emitter
-      var dataObj = data
-      dataObj.updatedAt = moment().utc().format()      
-      return db.collection('games').findOneAndUpdate(
-      {
-        room:data.room
-      },
-      {
-        "$set": dataObj
-      },{ new: true }).then(function(doc){
-        console.log(dataObj.room + '- data updated: ' + JSON.stringify(data));
-        io.emit('data', data);
-      })
-    });
-
-    socket.on('undo', function() { //undo emitter
-      console.log('user undo');
-      io.emit('undo');
-    });
-
-    socket.on('chat', function(data) { //move object emitter
-      console.log('chat');
-      io.emit('chat', data);
-    });    
-  });
 
   var server = http.listen(process.env.PORT, function () { //run http and web socket server
     var host = server.address().address;
