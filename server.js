@@ -194,7 +194,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
               data:{
                 title:'Marina: Te salió un envío!',
                 message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
-                link: process.env.APP_URL + '/envio/' + preference.value.external_reference,
+                link: process.env.APP_URL + '/envio/' + preference.value.mercadopago.external_reference,
                 linkText:'Ver detalle del envío'
               },
               templatePath:path.join(__dirname,'/email/template.html')
