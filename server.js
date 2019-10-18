@@ -185,13 +185,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           'new': true, 
           returnOriginal:false 
         }).then(function(preference){
-          console.log('------------------------')
-          console.log(preference.value)
-          console.log('------------------------2')
-          console.log(preference.value.mercadopago.status)
-          console.log('------------------------3')
-          console.log(response.data)
           if(preference.value.mercadopago.status === 'approved'){
+            console.log('sending email...')
             emailClient.send({
               //to:'mafrith@gmail.com',
               to:'telemagico@gmail.com',
@@ -199,7 +194,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
               data:{
                 title:'Marina: Te salió un envío!',
                 message: 'Nombre: ' + preference.value.datos.nombre + '<br>Teléfono : ' + preference.value.datos.telefono + '<br>Pasar a buscar en: ' + preference.value.ruta.from.formatted_address + '<br>Entregar en : ' + preference.value.ruta.to.formatted_address + '<br>',
-                link: process.env.APP_URL + '/envio/' + notification.value.external_reference,
+                link: process.env.APP_URL + '/envio/' + preference.value.external_reference,
                 linkText:'Ver detalle del envío'
               },
               templatePath:path.join(__dirname,'/email/template.html')
