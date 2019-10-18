@@ -1,10 +1,14 @@
 body {
 	font-family: 'Nunito', cursive;
 }
+
 .navbar-item img {
     max-height: 2.75rem;
 }
 
+.panel {
+  padding-top: 0.75rem;
+}
 /* spinner */
 
 .spinner-container {

@@ -7,7 +7,7 @@
 <script>
 
 	$(function(){
-
+		alert("1")
 		var secs = 0;
 		var countdown = 60
 		var countdownNumberEl = document.getElementById('countdown-number');
@@ -24,7 +24,7 @@
 
 			spinnerContainerEl.classList.remove('fadeOut')
 			spinnerContainerEl.classList.add('fadeIn')
-
+			alert("2")
 			$.ajax({
 				url: '/panel/search',
 				method:'post',
@@ -44,6 +44,7 @@
 							}
 						}
 					}
+					alert("3")
 
 					approvedEl.textContent = approved
 					rejectedEl.textContent = rejected
@@ -72,9 +73,7 @@
 
 <% include ./header %>
 
-<h3></h3>
-
-<div class="columns">
+<div class="columns panel">
 	<a href="/panel/preferencias" class="column has-background-info">
 		<h5 class="has-text-white">Preferencias</h5>
 		<h1 class="has-text-white is-size-1 has-text-centered">
