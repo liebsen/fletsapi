@@ -50,6 +50,11 @@
 					spinnerContainerEl.classList.remove('fadeIn')
 					spinnerContainerEl.classList.add('fadeOut')
 					document.title = '(' + preferencias + ') FletsPanel'
+				},
+				error: function(xhr, textStatus, error){
+				    alert(xhr.statusText);
+				    alert(textStatus);
+				    alert(error);
 				}
 			})	
 		}
