@@ -168,6 +168,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/mercadopago/notification', function (req, res) { 
+    console.log(req.body)
+    
     if(req.body.data){
       // check if notification exists
       db.collection('preferences').find({payment_id:req.body.data.id}).toArray(function(err, result) {
