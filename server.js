@@ -19,8 +19,9 @@ var nodeMailer = require('nodemailer')
 var allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
-  'https://fletsapp.com',
-  'https://fletsapp.herokuapp.com'
+  'https://fletsapp.herokuapp.com',
+  'https://fletsapi.herokuapp.com',
+  'https://fletsapp.com'  
 ]
 
 mercadopago.configure({
