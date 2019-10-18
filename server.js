@@ -173,12 +173,12 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       db.collection('preferences').find({payment_id:req.body.data.id}).toArray(function(err, result) {
         if(result.length === 0){
           axios.get('https://api.mercadopago.com/v1/payments/' + req.body.data.id + '?access_token=' + process.env.MP_TOKEN, {} ).then((response) => {
-            db.collection('preferences').findOneAndUpdate(
+            db.collection('preferences').findAndModify(
             {
               payment_id:req.body.data.id
             },
             {
-              "$inc": {
+              "$set": {
                 mercadopago : response.data
               }
             },{ 
