@@ -187,7 +187,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         }).then(function(preference){
           console.log('------------------------')
           console.log(preference.value)
-          console.log(preference.mercadopago.status)
+          console.log('------------------------2')
+          console.log(preference.value.mercadopago.status)
+          console.log('------------------------3')
           console.log(response.data)
           if(preference.value.mercadopago.status === 'approved'){
             emailClient.send({
