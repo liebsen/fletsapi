@@ -178,7 +178,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
               payment_id:req.body.data.id
             },
             {
-              "$set": {
+              "$inc": {
                 mercadopago : response.data
               }
             },{ 
