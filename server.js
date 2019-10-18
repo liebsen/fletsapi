@@ -115,8 +115,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
 
     const estimate = {
-      //amount: amount,
-      amount: 10.00,
+      amount: amount,
+      //amount: 10.00,
       currency: 'ARS'
     }
 
@@ -188,8 +188,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           if(preference.value.mercadopago.status === 'approved'){
             console.log('sending email...')
             emailClient.send({
-              //to:'mafrith@gmail.com',
-              to:'telemagico@gmail.com',
+              to:'mafrith@gmail.com',
+              //to:'telemagico@gmail.com',
               subject:'Tenés un envío de FletsApp',
               data:{
                 title:'Marina: Te salió un envío!',
