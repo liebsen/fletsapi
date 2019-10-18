@@ -7,7 +7,6 @@
 <script>
 
 	$(function(){
-		alert("1")
 		var secs = 0;
 		var countdown = 60
 		var countdownNumberEl = document.getElementById('countdown-number');
@@ -24,7 +23,6 @@
 
 			spinnerContainerEl.classList.remove('fadeOut')
 			spinnerContainerEl.classList.add('fadeIn')
-			alert("2")
 			$.ajax({
 				url: '/panel/search',
 				method:'post',
@@ -34,6 +32,7 @@
 					})
 				},
 				success: function(res){
+					alert("3")
 					for(var i in res.results){
 						preferencias++
 						if(res.results[i].mercadopago){
@@ -43,8 +42,7 @@
 								rejected++
 							}
 						}
-					}
-					alert("3")
+					}				
 
 					approvedEl.textContent = approved
 					rejectedEl.textContent = rejected
