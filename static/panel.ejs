@@ -8,32 +8,16 @@
 
 	$(function(){
 		var secs = 0;
-		var countdown = 60
-		var countdownNumberEl = document.getElementById('countdown-number');
+		var seconds = 60
+		var countdown = seconds
 		var circleEl = document.getElementById('circle');
 		var spinnerContainerEl = document.querySelector('.spinner-container')
 		var approvedEl = document.querySelector('.approved')
 		var preferencesEl = document.querySelector('.preferencias')
 		var rejectedEl = document.querySelector('.rejected')
+		var countdownNumberEl = document.getElementById('countdown-number');
 		var clock = 0
-		countdownNumberEl.textContent = countdown;
 
-		var startCountdown = function(){
-			if(clock){
-				clearInterval(clock)
-			}
-
-			clock = setInterval(function(){
-				countdown = --countdown <= 0 ? 60 : countdown;
-				if(countdown===1){
-					retrieve()	
-				}
-				countdownNumberEl.textContent = countdown;
-			},1000)
-			circleEl.style.aniamtion = 'none'
-			circleEl.style.animation = "countdown 60s linear infinite forwards";
-		}
-		
 		var retrieve = function(){
 			var preferencias = 0
 			var approved = 0
@@ -41,6 +25,7 @@
 
 			spinnerContainerEl.classList.remove('fadeOut')
 			spinnerContainerEl.classList.add('fadeIn')
+
 			$.ajax({
 				url: '/panel/search',
 				method:'post',
@@ -66,8 +51,32 @@
 					preferencesEl.textContent = preferencias
 					spinnerContainerEl.classList.remove('fadeIn')
 					spinnerContainerEl.classList.add('fadeOut')
-					startCountdown()
+
 					document.title = '(' + preferencias + ') FletsPanel'
+
+					if(clock){
+						clearInterval(clock)
+					}
+
+					countdownNumberEl.classList.remove('fadeOut')
+					countdownNumberEl.classList.add('fadeIn')
+					countdownNumberEl.textContent = countdown;
+
+					clock = setInterval(function(){
+						if(countdown===0){
+							console.log("retrieve & cleear animation")
+							countdownNumberEl.classList.remove('fadeIn')
+							countdownNumberEl.classList.add('fadeOut')
+							circleEl.classList.remove('countdown')
+							retrieve()	
+						} else if(countdown === seconds){
+							circleEl.classList.add('countdown')
+						}
+
+						countdownNumberEl.textContent = countdown;
+						countdown = --countdown < 0 ? seconds : countdown;
+					},1000)
+
 				},
 				error: function(xhr, textStatus, error){
 				    alert(xhr.statusText);
@@ -109,12 +118,11 @@
 		<h5 class="has-text-white">Pagos</h5>
 		<h1 class="has-text-white is-size-1 has-text-centered">0</h1>
 	</a-->
-	
 </div>
 
 <div id="countdown">
-  <div id="countdown-number"></div>
-  <svg>
-    <circle id="circle" r="18" cx="20" cy="20"></circle>
-  </svg>
+	<div id="countdown-number"></div>
+	<svg>
+		<circle id="circle" r="18" cx="20" cy="20"></circle>
+	</svg>
 </div>
