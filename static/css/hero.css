@@ -80,7 +80,7 @@ body {
   stroke-width: 2px;
   stroke: #209cee;
   fill: none;
-  animation: countdown 60s linear infinite forwards;
+  /*animation: countdown 60s linear infinite forwards;*/
 }
 
 @keyframes countdown {

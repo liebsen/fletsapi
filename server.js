@@ -257,7 +257,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     db.collection('accounts').findOne({
       email: email
     },function(err, user) {
-      console.log(user)
       if (err) return res.status(500).send('Error on the server.');
       if (!user) return res.status(404).send('No user found.');
       let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
@@ -363,7 +362,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     var body = JSON.parse(req.body.data)
     , limit = parseInt(body.limit)||50
     , offset = parseInt(body.offset)||0
-    console.log(body)
     db.collection('preferences').countDocuments(body.find, function(error, numOfResults){
       db.collection('preferences').find(body.find)
         .sort({_id:-1})
