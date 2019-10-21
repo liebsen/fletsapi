@@ -1,9 +1,12 @@
 body {
 	font-family: 'Nunito', cursive;
 }
+.navbar-item {
+  padding: 0 .75rem;
+}
 
 .navbar-item img {
-    max-height: 2.75rem;
+  max-height: 2.75rem;
 }
 
 .panel {
