@@ -1,7 +1,7 @@
 {
   "name": "fletsapi",
-  "version": "0.1.0",
-  "description": "FletsApp API",
+  "description": "FletsApp - Application Program Interface",
+  "version": "1.0.1",
   "scripts": {
     "start": "node server.js"
   },
@@ -13,6 +13,7 @@
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "express-ejs-layouts": "^2.5.0",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "mercadopago": "^1.2.0",
     "moment": "^2.24.0",

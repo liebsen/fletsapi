@@ -11,12 +11,14 @@ var moment = require('moment');
 var mongodb = require('mongodb');
 var expressLayouts = require('express-ejs-layouts')
 var bodyParser = require('body-parser')
-const mercadopago = require ('mercadopago');
+var mercadopago = require ('mercadopago');
 var onlinewhen = moment().utc().subtract(10, 'minutes')
 var emailHelper = require('./email/helper')
 var emailClient = emailHelper()
 var nodeMailer = require('nodemailer')
-var allowedOrigins = [
+var jwt = require('jsonwebtoken')
+const saltRounds = 10;
+const allowedOrigins = [
   'http://localhost:4000',
   'https://localhost:8080',
   'https://fletsapp.herokuapp.com',
@@ -65,10 +67,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   if(err) throw err
 
   const db = database.db(process.env.MONGO_URL.split('/').reverse()[0])
-
-  app.get('/', function (req, res) {
-    res.render('index')
-  });
 
   app.post('/flet/estimate', function (req, res) {  
 
@@ -250,19 +248,39 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
+  app.post('/account/login', (req, res) => {
+    var username = req.body.user
+    var password = req.body.password
+    db.collection('accounts').findOne({
+      username: username
+    },function(err, user) {
+      if (err) return res.status(500).send('Error on the server.');
+      if (!user) return res.status(404).send('No user found.');
+      let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+      if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
+      let token = jwt.sign({ id: user._id }, process.env.APP_SECRET, {
+          expiresIn: 86400 // expires in 24 hours
+      });
+      res.status(200).send({ auth: true, token: token, user: user });
+    })
+  })
+
   app.post('/account/create', function (req, res) {  
-    bcrypt.hash(req.body.passwordsignup, saltRounds, function (err,   hash) {
+    var email = req.body.email
+    var password = req.body.password
+    var code = random_code(32)
+
+    bcrypt.hash(password, saltRounds, function (err, hash) {
       db.collection('accounts').findOneAndUpdate({
-        name: req.body.usernamesignup,   
-        email: req.body.emailsignup,   
-        password: hash   
+        email: email,
+        password: hash
       },
       {
         "$set": {
-          name: req.body.usernamesignup,   
-          email: req.body.emailsignup,   
-          password: hash,  
-          date:moment().utc().format('YYYY.MM.DD'),
+          email: email,
+          password: hash,
+          code: code,
+          date: moment().utc().format('YYYY.MM.DD'),
           role: 'provider'
         }
       },{ 
@@ -272,15 +290,15 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       }).then(function(data) {    
         if (data) {   
           emailClient.send({
-            to:updatedShipment.shipper_email,
-            subject:'Ups! Nos figura pendiente tu pago para comenzar con tu envio. ',
+            to:email,
+            subject:'Bienvenido',
             data:{
-              title:'Confirmá el pago de tu envio',
-              message:'Hola! Te recordamos que todos nuestros envíos comienzan una vez realizado el pago correspondiente. <br /> <br />Todavía estas a tiempo de que comencemos con tu envio si lo abonas antes de las 15:00hs sino lo enviaremos el día siguiente cuando procesamos el pago. =) ',
-              link: cfg.senders.WEBSITE_HOST + '/tu-envio.html?id='+updatedShipment.id,
-              linkText:'Ver el estado de mi envío'
+              title:'Confirmá la creación de tu cuenta',
+              message:'Hola! Por favor valida tu cuenta ahora para poder usar FletsApp',
+              link: req.protocol + '://' + req.get('host') + '/account/validate?code=' + code,
+              linkText:'Validar mi cuenta'
             },
-            templatePath:cfg.senders.emailsTemplatePath
+            templatePath:path.join(__dirname,'/email/template.html')
           }).catch(function(err){
             if(err) console.log(err)
           }).then(function(){
@@ -294,6 +312,28 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     });
   });
 
+  app.post('/account/validate', function (req, res) {  
+    db.collection('accounts').findOneAndUpdate({
+      code: req.body.code
+    },
+    {
+      "$set": {
+        validated: "yes",
+        validated_date: moment().utc().format('YYYY.MM.DD')
+      }
+    },{ 
+      upsert: true, 
+      'new': true, 
+      returnOriginal:false 
+    }).then(function(data) {  
+      let token = jwt.sign({ id: user.id }, config.secret, {
+          expiresIn: 86400 // expires in 24 hours
+      });
+      res.status(200).send({ auth: true, token: token, user: user });
+    }).catch(function(err){
+      if(err) return res.status(500).send("There was a problem getting user")
+    })
+  })
 
   // admin panel. todo: add auth
 
@@ -328,6 +368,10 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           return res.json({results:results,count:numOfResults})
         })   
     })
+  })
+
+  app.get('/', function (req, res) {
+    res.render('index')
   })
 
   var server = http.listen(process.env.PORT, function () { //run http and web socket server
