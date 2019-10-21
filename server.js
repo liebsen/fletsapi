@@ -268,19 +268,23 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   app.post('/account/create', function (req, res) {  
     var email = req.body.email
     var password = req.body.password
-    var code = random_code(32)
+    var name = req.body.name
+    var code = req.body.code
+    var validation_code = random_code(32)
 
     bcrypt.hash(password, saltRounds, function (err, hash) {
       db.collection('accounts').findOneAndUpdate({
-        email: email,
-        password: hash
+        code: code
       },
       {
         "$set": {
+          code: null,
           email: email,
           password: hash,
-          code: code,
-          date: moment().utc().format('YYYY.MM.DD'),
+          name: name,
+          validation_code: validation_code,
+          validation_date: null,
+          registration_date: moment().utc().format('YYYY.MM.DD'),
           role: 'provider'
         }
       },{ 
@@ -288,27 +292,24 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         'new': true, 
         returnOriginal:false 
       }).then(function(data) {    
-        if (data) {   
-          emailClient.send({
-            to:email,
-            subject:'Bienvenido',
-            data:{
-              title:'Confirmá la creación de tu cuenta',
-              message:'Hola! Por favor valida tu cuenta ahora para poder usar FletsApp',
-              link: req.protocol + '://' + req.get('host') + '/account/validate?code=' + code,
-              linkText:'Validar mi cuenta'
-            },
-            templatePath:path.join(__dirname,'/email/template.html')
-          }).catch(function(err){
-            if(err) console.log(err)
-          }).then(function(){
-            return res.json({ 
-              status : 'success', 
-              data:data
-            })
-          })
-        }  
-      }); 
+        emailClient.send({
+          to:email,
+          subject:'Bienvenido ' + data.name,
+          data:{
+            title:'Confirmá la creación de tu cuenta',
+            message:'Hola! Por favor valida tu cuenta ahora para poder usar FletsApp',
+            link: req.protocol + '://' + req.get('host') + '/account/validate?code=' + code,
+            linkText:'Validar mi cuenta'
+          },
+          templatePath:path.join(__dirname,'/email/template.html')
+        }).catch(function(err){
+          if(err) console.log(err)
+        }).then(function(){
+          res.status(200).send({ status: 'success' });
+        })
+      }).catch((err) => {
+        res.status(404).send('No code found.');
+      }) 
     });
   });
 
