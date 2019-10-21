@@ -252,11 +252,12 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/account/login', (req, res) => {
-    var username = req.body.user
+    var email = req.body.email
     var password = req.body.password
     db.collection('accounts').findOne({
-      username: username
+      email: email
     },function(err, user) {
+      console.log(user)
       if (err) return res.status(500).send('Error on the server.');
       if (!user) return res.status(404).send('No user found.');
       let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
