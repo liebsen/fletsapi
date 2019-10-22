@@ -62,7 +62,7 @@ body {
 }
 
 #countdown-number {
-  color: #209cee;
+  color: #23d160;
   display: inline-block;
   line-height: 40px;
 }
@@ -80,8 +80,8 @@ body {
   stroke-dasharray: 113px;
   stroke-dashoffset: 0px;
   stroke-linecap: round;
-  stroke-width: 2px;
-  stroke: #209cee;
+  stroke-width: 3px;
+  stroke: #23d160;
   fill: none;
 }
 
