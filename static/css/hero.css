@@ -86,7 +86,7 @@ body {
 }
 
 .countdown {
-  animation: countdown 10s linear infinite forwards;
+  animation: countdown 60s linear infinite forwards;
 }
 
 @keyframes countdown {
