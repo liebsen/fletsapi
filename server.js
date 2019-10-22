@@ -38,12 +38,14 @@ app.use(cors({
     // allow requests with no origin 
     // (like mobile apps or curl requests)
     if(!origin) {
-      console.log(origin)
+      console.log("not allowed origin to unknown")
       return callback(null, true)
     }
     if(allowedOrigins.indexOf(origin) === -1){
       var msg = 'The CORS policy for this site does not ' +
                 'allow access from the specified Origin.'
+      console.log("not allowed origin")
+      console.log(origin)
       return callback(new Error(msg), false)
     }
     return callback(null, true)
