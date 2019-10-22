@@ -328,7 +328,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     },function(err, result) {
       if (err) return res.status(500).send('Error on the server.');
       if (!result) return res.status(404).send('No code found.');
-      return res.status(200).send()
+      return res.status(200).send({status:'success'})
     })
   })
 
