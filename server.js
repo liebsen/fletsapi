@@ -325,10 +325,10 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   app.post('/account/validate_code', function (req, res) {  
     db.collection('accounts').findOne({
       code: req.body.code
-    },function(err, code) {
+    },function(err, result) {
       if (err) return res.status(500).send('Error on the server.');
-      if (!code) return res.status(404).send('No code found.');
-      return res.status(200)
+      if (!result) return res.status(404).send('No code found.');
+      return res.status(200).send()
     })
   })
 
