@@ -344,7 +344,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
-  // admin panel. todo: add auth
+  // admin panel. todo: remove this and use fletspanel app
 
   app.get('/panel', function (req, res) { 
     res.render('panel')
