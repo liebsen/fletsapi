@@ -290,9 +290,10 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           email: email,
           password: hash,
           name: name,
+          validated: false,
           validation_code: validation_code,
           validation_date: null,
-          registration_date: moment().utc().format('YYYY.MM.DD'),
+          registration_date: moment().utc().format(),
           role: 'provider'
         }
       },{ 
@@ -318,9 +319,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       }).catch((err) => {
         res.status(404).send('No code found.');
       }) 
-    });
-  });
-
+    })
+  })
 
   app.post('/account/validate_code', function (req, res) {  
     db.collection('accounts').findOne({
