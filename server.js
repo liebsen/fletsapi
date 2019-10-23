@@ -142,7 +142,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   app.post('/flet/preference', function (req, res) {  
     // Crea un objeto de preferencia
     var ObjectId = require('mongodb').ObjectId; 
-    db.collection('preferences').find({'_id': new ObjectId(req.body.id)}).toArray(function(err, results) {
+    db.collection('preferences').find({
+      '_id': new ObjectId(req.body.id)
+    }).toArray(function(err, results) {
       if(results.length && results[0].estimate.amount){
         let preference = {
           items: [
@@ -375,6 +377,18 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         .toArray(function(err,results){
           return res.json({results:results,count:numOfResults})
         })   
+    })
+  })
+
+  app.post('/panel/flet', checkToken, function (req, res) { 
+    if(!req.body) return res.json({'error':'not_enough_params'})
+    var ObjectId = require('mongodb').ObjectId; 
+    db.collection('preferences').find({
+      '_id': new ObjectId(req.body.id)
+    }).toArray(function(err, results) {
+      if (err) return res.status(500).send('Error on the server.');
+      if (!results[0]) return res.status(404).send('No flet found.');
+      res.json({ status:'success',flet: results[0] });
     })
   })
 
