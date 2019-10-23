@@ -363,25 +363,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
-  // admin panel. todo: remove this and use fletspanel app
-
-  app.get('/panel', function (req, res) { 
-    res.render('panel')
-  })
-
-  app.get('/panel/flets', function (req, res) { 
-    res.render('flets')
-  })
-
-  app.get('/panel/preferencias', function (req, res) { 
-    res.render('preferencias')
-  })
-
-  app.get('/panel/pagos', function (req, res) { 
-    res.render('pagos')
-  })
-
   app.post('/panel/search', function (req, res) { 
+
+    console.log(req.headers);
     if(!req.body) return res.json({'error':'not_enough_params'})
     var body = JSON.parse(req.body.data)
     , limit = parseInt(body.limit)||50
