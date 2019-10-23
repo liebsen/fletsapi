@@ -341,13 +341,13 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/account/validate', function (req, res) {  
     db.collection('accounts').findOneAndUpdate({
-      validate_code: req.body.code
+      validation_code: req.body.code
     },
     {
       "$set": {
         validate_code:null,
         validated: true,
-        validated_date: moment().utc().format()
+        validation_date: moment().utc().format()
       }
     },{ 
       upsert: true, 
