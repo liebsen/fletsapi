@@ -345,7 +345,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     },
     {
       "$set": {
-        validate_code:null,
+        validation_code:null,
         validated: true,
         validation_date: moment().utc().format()
       }
@@ -359,7 +359,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       });
       res.status(200).send({ auth: true, token: token, user: user });
     }).catch(function(err){
-      if(err) return res.status(500).send("There was a problem getting user")
+      if(err) return res.status(500).send("There was a problem getting user " + err)
     })
   })
 
