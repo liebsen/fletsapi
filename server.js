@@ -280,45 +280,52 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     var code = req.body.code
     var validation_code = random_code(32)
 
-    bcrypt.hash(password, saltRounds, function (err, hash) {
-      db.collection('accounts').findOneAndUpdate({
-        code: code
-      },
-      {
-        "$set": {
-          code: null,
-          email: email,
-          password: hash,
-          name: name,
-          validated: false,
-          validation_code: validation_code,
-          validation_date: null,
-          registration_date: moment().utc().format(),
-          role: 'provider'
-        }
-      },{ 
-        upsert: true, 
-        'new': true, 
-        returnOriginal:false 
-      }).then(function(data) {    
-        emailClient.send({
-          to:email,
-          subject:'Bienvenido ' + data.name,
-          data:{
-            title:'Confirmá la creación de tu cuenta',
-            message:'Hola! Por favor valida tu cuenta ahora para poder usar FletsApp',
-            link: req.protocol + '://' + req.get('host') + '/account/validate?code=' + code,
-            linkText:'Validar mi cuenta'
-          },
-          templatePath:path.join(__dirname,'/email/template.html')
-        }).catch(function(err){
-          if(err) console.log(err)
-        }).then(function(){
-          res.status(200).send({ status: 'success' });
-        })
-      }).catch((err) => {
-        res.status(404).send('No code found.');
-      }) 
+    db.collection('accounts').findOne({
+      email: email
+    },function(err, result) {
+      if (err) return res.status(500).send('Error on the server.');
+      if (result) return res.status(404).send('Email already in use.');
+
+      bcrypt.hash(password, saltRounds, function (err, hash) {
+        db.collection('accounts').findOneAndUpdate({
+          code: code
+        },
+        {
+          "$set": {
+            code: null,
+            email: email,
+            password: hash,
+            name: name,
+            validated: false,
+            validation_code: validation_code,
+            validation_date: null,
+            registration_date: moment().utc().format(),
+            role: 'provider'
+          }
+        },{ 
+          upsert: true, 
+          'new': true, 
+          returnOriginal:false 
+        }).then(function(data) {    
+          emailClient.send({
+            to:email,
+            subject: name + ', te damos la bienvenida a FletsPanel.',
+            data:{
+              title:'Confirmá la creación de tu cuenta',
+              message:'Hola ' + name + '! Por favor valida tu cuenta ahora para empezar a usar FletsPanel',
+              link: req.protocol + '://' + req.get('host') + '/account/validate?code=' + validation_code,
+              linkText:'Validar mi cuenta'
+            },
+            templatePath:path.join(__dirname,'/email/template.html')
+          }).catch(function(err){
+            if(err) console.log(err)
+          }).then(function(){
+            res.status(200).send({ status: 'success' });
+          })
+        }).catch((err) => {
+          res.status(404).send('No code found.');
+        }) 
+      })
     })
   })
 
