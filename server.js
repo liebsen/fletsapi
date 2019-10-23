@@ -284,7 +284,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       email: email
     },function(err, result) {
       if (err) return res.status(500).send('Error on the server.');
-      if (result) return res.status(404).send('Email already in use.');
+      if (result) return res.status(403).send('Email already in use.');
 
       bcrypt.hash(password, saltRounds, function (err, hash) {
         db.collection('accounts').findOneAndUpdate({
@@ -313,7 +313,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
             data:{
               title:'Confirmá la creación de tu cuenta',
               message:'Hola ' + name + '! Por favor valida tu cuenta ahora para empezar a usar FletsPanel',
-              link: req.protocol + '://' + req.get('host') + '/account/validate?code=' + validation_code,
+              link: process.env.PANEL_URL + '/validate/' + validation_code,
               linkText:'Validar mi cuenta'
             },
             templatePath:path.join(__dirname,'/email/template.html')
@@ -341,10 +341,11 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/account/validate', function (req, res) {  
     db.collection('accounts').findOneAndUpdate({
-      code: req.body.code
+      validate_code: req.body.code
     },
     {
       "$set": {
+        validate_code:null,
         validated: true,
         validated_date: moment().utc().format()
       }
