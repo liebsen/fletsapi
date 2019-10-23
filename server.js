@@ -338,8 +338,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     },
     {
       "$set": {
-        validated: "yes",
-        validated_date: moment().utc().format('YYYY.MM.DD')
+        validated: true,
+        validated_date: moment().utc().format()
       }
     },{ 
       upsert: true, 
