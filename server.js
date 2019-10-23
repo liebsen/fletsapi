@@ -354,7 +354,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       'new': true, 
       returnOriginal:false 
     }).then(function(user) {  
-      let token = jwt.sign({ id: user._id }, config.secret, {
+      let token = jwt.sign({ id: user._id }, process.env.APP_SECRET, {
           expiresIn: 86400 // expires in 24 hours
       });
       res.status(200).send({ auth: true, token: token, user: user });
