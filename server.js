@@ -192,7 +192,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           returnOriginal:false 
         }).then(function(preference){
           if(preference.value.mercadopago.status === 'approved'){
-            console.log('sending email...')
             emailClient.send({
               to:'mafrith@gmail.com',
               //to:'telemagico@gmail.com',
@@ -363,9 +362,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
-  app.post('/panel/search', function (req, res) { 
-
-    console.log(req.headers);
+  app.post('/panel/search', checkToken, function (req, res) { 
     if(!req.body) return res.json({'error':'not_enough_params'})
     var body = JSON.parse(req.body.data)
     , limit = parseInt(body.limit)||50
@@ -391,3 +388,19 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     console.log('Server listening at address ' + host + ', port ' + port);
   });
 });
+
+//Check to make sure header is not undefined, if so, return Forbidden (403)
+const checkToken = (req, res, next) => {
+    const header = req.headers['authorization'];
+
+    if(typeof header !== 'undefined') {
+        const bearer = header.split(' ');
+        const token = bearer[1];
+
+        req.token = token;
+        next();
+    } else {
+        //If header is undefined return Forbidden (403)
+        res.sendStatus(403)
+    }
+}
