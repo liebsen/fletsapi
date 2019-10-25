@@ -405,11 +405,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
 //Check to make sure header is not undefined, if so, return Forbidden (403)
 const checkToken = (req, res, next) => {
-  const header = req.headers['authorization'];
-
-  if(typeof header !== 'undefined') {
-    const bearer = header.split(' ');
-    const token = bearer[1];
+  const token = req.headers['authorization'];
+  if(typeof token !== 'undefined') {
     jwt.verify(token, process.env.APP_SECRET, function(err, decoded) {
       if(!err && decoded) {
         next();
