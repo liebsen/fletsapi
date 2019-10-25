@@ -127,7 +127,6 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     }
 
     req.body.estimate = estimate
-    req.body.createdAt = moment().utc().format()
 
     db.collection('preferences').insertOne(req.body, function(err,doc){
       let data = {
@@ -369,19 +368,14 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     if(!req.body) return res.json({'error':'not_enough_params'})
     var body = JSON.parse(req.body.data)
     , limit = parseInt(body.limit)||50
-    , skip = parseInt(body.skip)||0
-    , find = body.find || {}
-    , sort = body.sort || {_id:-1}
-    db.collection('preferences').countDocuments(find, function(error, numOfResults){
-      db.collection('preferences').find(find)
-        .sort(sort)
+    , offset = parseInt(body.offset)||0
+    db.collection('preferences').countDocuments(body.find, function(error, numOfResults){
+      db.collection('preferences').find(body.find)
+        .sort({_id:-1})
         .limit(limit)
-        .skip(skip)
+        .skip(offset)
         .toArray(function(err,results){
-          res.json({
-            count:numOfResults,
-            results:results            
-          })
+          return res.json({results:results,count:numOfResults})
         })   
     })
   })
