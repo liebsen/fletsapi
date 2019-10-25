@@ -12,6 +12,7 @@ var mongodb = require('mongodb');
 var expressLayouts = require('express-ejs-layouts')
 var bodyParser = require('body-parser')
 var mercadopago = require ('mercadopago');
+var onlinewhen = moment().utc().subtract(10, 'minutes')
 var emailHelper = require('./email/helper')
 var emailClient = emailHelper()
 var nodeMailer = require('nodemailer')
@@ -26,12 +27,10 @@ const allowedOrigins = [
   'https://fletsapp.com'  
 ]
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
-  next();
+mercadopago.configure({
+  //sandbox: true,
+  //access_token: process.env.MP_TOKEN_TEST
+  access_token: process.env.MP_TOKEN
 });
 
 app.use(cors({
@@ -53,18 +52,20 @@ app.use(cors({
   }
 }))
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+  next();
+});
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({ type: 'application/json' }))
 app.set('views', path.join(__dirname, 'static'))
 app.use(express.static(path.join(__dirname, 'static')))
 app.set('view engine', 'ejs')
 app.use(expressLayouts)
-
-mercadopago.configure({
-  //sandbox: true,
-  //access_token: process.env.MP_TOKEN_TEST
-  access_token: process.env.MP_TOKEN
-})
 
 var random_code = function (factor){ 
   return Math.random().toString(36).substring(2, factor) + Math.random().toString(36).substring(2, factor)
