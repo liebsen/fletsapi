@@ -12,7 +12,6 @@ var mongodb = require('mongodb');
 var expressLayouts = require('express-ejs-layouts')
 var bodyParser = require('body-parser')
 var mercadopago = require ('mercadopago');
-var onlinewhen = moment().utc().subtract(10, 'minutes')
 var emailHelper = require('./email/helper')
 var emailClient = emailHelper()
 var nodeMailer = require('nodemailer')
@@ -27,10 +26,12 @@ const allowedOrigins = [
   'https://fletsapp.com'  
 ]
 
-mercadopago.configure({
-  //sandbox: true,
-  //access_token: process.env.MP_TOKEN_TEST
-  access_token: process.env.MP_TOKEN
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+  next();
 });
 
 app.use(cors({
@@ -52,20 +53,18 @@ app.use(cors({
   }
 }))
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
-  next();
-});
-
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({ type: 'application/json' }))
 app.set('views', path.join(__dirname, 'static'))
 app.use(express.static(path.join(__dirname, 'static')))
 app.set('view engine', 'ejs')
 app.use(expressLayouts)
+
+mercadopago.configure({
+  //sandbox: true,
+  //access_token: process.env.MP_TOKEN_TEST
+  access_token: process.env.MP_TOKEN
+})
 
 var random_code = function (factor){ 
   return Math.random().toString(36).substring(2, factor) + Math.random().toString(36).substring(2, factor)
@@ -127,6 +126,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     }
 
     req.body.estimate = estimate
+    req.body.createdAt = moment().utc().format()
 
     db.collection('preferences').insertOne(req.body, function(err,doc){
       let data = {
@@ -405,16 +405,19 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
 //Check to make sure header is not undefined, if so, return Forbidden (403)
 const checkToken = (req, res, next) => {
-    const header = req.headers['authorization'];
+  const header = req.headers['authorization'];
 
-    if(typeof header !== 'undefined') {
-        const bearer = header.split(' ');
-        const token = bearer[1];
-
-        req.token = token;
+  if(typeof header !== 'undefined') {
+    const bearer = header.split(' ');
+    const token = bearer[1];
+    jwt.verify(token, process.env.APP_SECRET, function(err, decoded) {
+      if(!err && decoded) {
         next();
-    } else {
-        //If header is undefined return Forbidden (403)
-        res.sendStatus(403)
-    }
+      }
+    })
+    res.sendStatus(403)
+  } else {
+    //If header is undefined return Forbidden (403)
+    res.sendStatus(403)
+  }
 }
