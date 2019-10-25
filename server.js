@@ -127,6 +127,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     }
 
     req.body.estimate = estimate
+    req.body.createdAt = moment().utc().format()
 
     db.collection('preferences').insertOne(req.body, function(err,doc){
       let data = {
