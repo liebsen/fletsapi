@@ -17,6 +17,7 @@ var emailHelper = require('./email/helper')
 var emailClient = emailHelper()
 var nodeMailer = require('nodemailer')
 var jwt = require('jsonwebtoken')
+const tokenExpires = 86400 * 30 // 30 days
 const saltRounds = 10;
 const allowedOrigins = [
   'http://localhost:4000',
@@ -269,7 +270,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
       if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
       let token = jwt.sign({ id: user._id }, process.env.APP_SECRET, {
-          expiresIn: 86400 // expires in 24 hours
+          expiresIn: tokenExpires // expires in 24 hours
       });
       res.status(200).send({ auth: true, token: token, user: user });
     })
@@ -357,7 +358,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       returnOriginal:false 
     }).then(function(user) {  
       let token = jwt.sign({ id: user._id }, process.env.APP_SECRET, {
-          expiresIn: 86400 // expires in 24 hours
+          expiresIn: tokenExpires // expires in 24 hours
       });
       res.status(200).send({ auth: true, token: token, user: user });
     }).catch(function(err){
