@@ -13,14 +13,16 @@ var expressLayouts = require('express-ejs-layouts')
 var bodyParser = require('body-parser')
 var mercadopago = require ('mercadopago');
 var onlinewhen = moment().utc().subtract(10, 'minutes')
+var helper = require('./helper')
 var emailHelper = require('./email/helper')
 var emailClient = emailHelper()
 var nodeMailer = require('nodemailer')
 var jwt = require('jsonwebtoken')
-const tokenExpires = 86400 * 30 // 30 days
+const tokenExpires = 86400 * 30 * 12 // 1 year
 const saltRounds = 10;
 const allowedOrigins = [
   'http://localhost:4000',
+  'http://localhost:8080',
   'https://localhost:8080',
   'https://fletsapp.herokuapp.com',
   'https://fletspanel.herokuapp.com',
@@ -385,6 +387,87 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
           })
         })   
     })
+  })
+
+
+  app.post('/panel/charts', checkToken, function (req, res) { 
+    var types = { week : 4, month : 3 } 
+    , data = {}
+    , max = 0
+
+    db.collection('preferences').find({})
+      .sort({_id:-1})
+      .limit(1000)
+      .skip(0)
+      .toArray(function(err,results){
+        results.forEach((item) => {
+          for(var j in types){
+            for(var i = 0; i < types[j]; i++ ){
+              var date = moment.utc(item.createdAt,'YYYY-MM-DD');
+              if(helper.isPeriod(date,i,j)){
+                if(!data[j]) data[j] = {}
+                if(!data[j][i]) data[j][i] = {
+                  preferences: 0,
+                  approved: 0
+                }
+                data[j][i].preferences++
+
+                if(max < data[j][i].preferences){
+                  max = data[j][i].preferences
+                }
+
+                if(item.mercadopago){
+                  if(!data[j][i][item.mercadopago.status]) 
+                    data[j][i][item.mercadopago.status] = 0
+                  data[j][i][item.mercadopago.status]++
+                }
+              } 
+            }
+          }
+        })
+
+        return res.json({
+          max: max,
+          data: data
+        })
+      })  
+      // ./ 
+  })
+
+
+  app.post('/panel/list', checkToken, function (req, res) { 
+    var data = {}
+    , type = req.body.type
+    , view = req.body.view
+    , period = req.body.period
+    , from = null
+    , to = null
+
+    if(period>0){
+      from = moment().subtract(period,view + (period>1?'s':'')).utc().startOf(view)
+      to = moment().subtract(period,view + (period>1?'s':'')).utc().endOf(view)
+    } else {
+      from = moment().utc().startOf(view),
+      to = moment().utc().endOf(view)
+    }
+
+    db.collection('preferences').find(
+      {
+        "createdAt": 
+        {
+          $gte: from.format(),
+          $lt: to.format()
+        }
+      })
+      .sort({_id:-1})
+      .limit(1000)
+      .skip(0)
+      .toArray(function(err,data){
+        return res.json({
+          data: data
+        })
+      })  
+      // ./ 
   })
 
   app.post('/preference', checkToken, function (req, res) { 
