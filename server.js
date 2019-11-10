@@ -389,6 +389,13 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
+  app.post('/panel/settings', checkToken, function (req, res) { 
+    const token = req.headers['authorization'];
+    console.log("1")
+    jwt.verify(token, process.env.APP_SECRET, function(err, decoded) {
+      console.log(decoded)
+    })
+  })
 
   app.post('/panel/charts', checkToken, function (req, res) { 
     var types = { week : 4, month : 3 } 
@@ -496,8 +503,10 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 //Check to make sure header is not undefined, if so, return Forbidden (403)
 const checkToken = (req, res, next) => {
   const token = req.headers['authorization'];
+  console.log("token:" +token)
   if(typeof token !== 'undefined') {
     jwt.verify(token, process.env.APP_SECRET, function(err, decoded) {
+      console.log(decoded)
       if(!err && decoded) {
         next();
       } else {
