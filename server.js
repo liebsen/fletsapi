@@ -389,12 +389,41 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     })
   })
 
-  app.post('/panel/settings', checkToken, function (req, res) { 
-    const token = req.headers['authorization'];
-    console.log("1")
-    jwt.verify(token, process.env.APP_SECRET, function(err, decoded) {
-      console.log(decoded)
+  app.post('/data', checkToken, function (req, res) { 
+    var ObjectId = require('mongodb').ObjectId; 
+    db.collection('accounts').find({
+      '_id': new ObjectId(req.decoded.id)
     })
+    .limit(1)
+    .toArray(function(err,results){
+      return res.json({
+        status: 'success',
+        data:results[0]
+      })
+    })   
+  })
+
+  app.post('/settings', checkToken, function (req, res) { 
+    var ObjectId = require('mongodb').ObjectId;
+    db.collection('accounts').findOneAndUpdate(
+    {
+      '_id': new ObjectId(req.decoded.id)
+    },
+    {
+      "$set": {
+        settings : req.body
+      }
+    }).then(function(){
+      return res.json({
+        status: 'success'
+      })
+    }).catch(function(err){
+      if(err){
+        return res.json({
+          status: 'error'
+        })
+      }
+    })   
   })
 
   app.post('/panel/charts', checkToken, function (req, res) { 
@@ -503,11 +532,10 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 //Check to make sure header is not undefined, if so, return Forbidden (403)
 const checkToken = (req, res, next) => {
   const token = req.headers['authorization'];
-  console.log("token:" +token)
   if(typeof token !== 'undefined') {
     jwt.verify(token, process.env.APP_SECRET, function(err, decoded) {
-      console.log(decoded)
       if(!err && decoded) {
+        req.decoded = decoded
         next();
       } else {
         res.sendStatus(403)    
