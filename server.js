@@ -124,8 +124,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
 
     const estimate = {
-      amount: amount,
-      //amount: 10.00,
+      //amount: amount,
+      amount: 100.00,
       currency: 'ARS'
     }
 
@@ -262,7 +262,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/account/login', (req, res) => {
-    var email = req.body.email
+    var email = req.body.email.toLowerString()
     var password = req.body.password
     db.collection('accounts').findOne({
       email: email
@@ -427,7 +427,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/panel/charts', checkToken, function (req, res) { 
-    var types = { week : 4, month : 3 } 
+    var types = { week : 4, month : 6 } 
     , data = {}
     , max = 0
 
