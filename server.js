@@ -85,30 +85,14 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     // calculo manual de cotizacion
     // todo : hacerlo dinamico para plataforma
 
+    req.body.movil = req.params.movil 
+
     var ObjectId = require('mongodb').ObjectId; 
     db.collection('accounts').find({
       '_id': new ObjectId(req.params.movil)
     }).toArray(function(err, results) {
       if(!results[0]) return res.json({status:'error',message:'Falta código del sender.'})
       const preference =  results[0].settings
-
-      /*
-      const preference = {
-        distance: {
-          basic: 20, // Distancia básica en kms
-          max: 50, // Maximo en kms
-          price : 700, // Tarifa básica en ARS
-          karma : 38 // Precio por unidad por exceso del básico
-        },
-        weight: {
-          basic: 100, // Peso básico en kg
-          max: 500, // Maximo en kg
-          price: 150, // Tarifa básica en ARS
-          karma : 3 // Precio por unidad por exceso del básico
-        }
-      }
-      */
-
       // todo: refactor cost feature vector
       // ie: price + (value - basic) * karma
 
@@ -144,6 +128,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       db.collection('preferences').insertOne(req.body, function(err,doc){
         let data = {
           id: doc.insertedId,
+
           status: 'success',
           estimate: estimate
         }
