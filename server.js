@@ -117,7 +117,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
 
       const estimate = {
-        amount: amount,
+        amount: parseInt(amount),
         //amount: 10.00,
         currency: 'ARS'
       }
