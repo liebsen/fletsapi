@@ -98,22 +98,22 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
       // distance
       let distance = Math.round(req.body.ruta.distance.value/1000) // in km
-      var delta = distance - preference.route.min;
+      var delta = distance - parseFloat(preference.route.min,10);
 
       if(delta < 0){
         delta = 0;
       }
 
-      let dpart = preference.route.price + delta * preference.route.karma;
+      let dpart = parseFloat(preference.route.price) + delta * parseFloat(preference.route.karma,10);
 
       // weight 
-      delta = req.body.carga.peso - preference.cargo.min;
+      delta = req.body.carga.peso - parseFloat(preference.cargo.min,10);
 
       if(delta < 0){
         delta = 0;
       }
 
-      let wpart = preference.cargo.price + delta * preference.cargo.karma;
+      let wpart = parseFloat(preference.cargo.price,10) + delta * parseFloat(preference.cargo.karma,10);
       let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
 
       const estimate = {
