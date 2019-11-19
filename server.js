@@ -262,7 +262,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
   app.post('/account/login', (req, res) => {
-    var email = req.body.email.toLowerString()
+    var email = req.body.email.toLowerCase()
     var password = req.body.password
     db.collection('accounts').findOne({
       email: email
