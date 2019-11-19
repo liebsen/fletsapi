@@ -79,67 +79,77 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   const db = database.db(process.env.MONGO_URL.split('/').reverse()[0])
 
-  app.post('/flet/estimate', function (req, res) {  
+  app.post('/flet/estimate/:movil', function (req, res) {  
 
     // unique user hardcode settings
     // calculo manual de cotizacion
     // todo : hacerlo dinamico para plataforma
 
-    const preference = {
-      distance: {
-        basic: 20, // Distancia básica en kms
-        max: 50, // Maximo en kms
-        price : 700, // Tarifa básica en ARS
-        karma : 38 // Precio por unidad por exceso del básico
-      },
-      weight: {
-        basic: 100, // Peso básico en kg
-        max: 500, // Maximo en kg
-        price: 150, // Tarifa básica en ARS
-        karma : 3 // Precio por unidad por exceso del básico
+    var ObjectId = require('mongodb').ObjectId; 
+    db.collection('accounts').find({
+      '_id': new ObjectId(req.params.movil)
+    }).toArray(function(err, results) {
+      if(!results[0]) return res.json({status:'error',message:'Falta código del sender.'})
+      const preference =  results[0].settings
+
+      /*
+      const preference = {
+        distance: {
+          basic: 20, // Distancia básica en kms
+          max: 50, // Maximo en kms
+          price : 700, // Tarifa básica en ARS
+          karma : 38 // Precio por unidad por exceso del básico
+        },
+        weight: {
+          basic: 100, // Peso básico en kg
+          max: 500, // Maximo en kg
+          price: 150, // Tarifa básica en ARS
+          karma : 3 // Precio por unidad por exceso del básico
+        }
       }
-    }
+      */
 
-    // todo: refactor cost feature vector
-    // ie: price + (value - basic) * karma
+      // todo: refactor cost feature vector
+      // ie: price + (value - basic) * karma
 
-    // distance
-    let distance = Math.round(req.body.ruta.distance.value/1000) // in km
-    var delta = distance - preference.distance.basic;
+      // distance
+      let distance = Math.round(req.body.ruta.distance.value/1000) // in km
+      var delta = distance - preference.route.min;
 
-    if(delta < 0){
-      delta = 0;
-    }
-
-    let dpart = preference.distance.price + delta * preference.distance.karma;
-
-    // weight 
-    delta = req.body.carga.peso - preference.weight.basic;
-
-    if(delta < 0){
-      delta = 0;
-    }
-
-    let wpart = preference.weight.price + delta * preference.weight.karma;
-    let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
-
-    const estimate = {
-      amount: amount,
-      //amount: 10.00,
-      currency: 'ARS'
-    }
-
-    req.body.estimate = estimate
-    req.body.createdAt = moment().utc().format()
-
-    db.collection('preferences').insertOne(req.body, function(err,doc){
-      let data = {
-        id: doc.insertedId,
-        status: 'success',
-        estimate: estimate
+      if(delta < 0){
+        delta = 0;
       }
 
-      return res.json(data)
+      let dpart = preference.route.price + delta * preference.route.karma;
+
+      // weight 
+      delta = req.body.carga.peso - preference.cargo.min;
+
+      if(delta < 0){
+        delta = 0;
+      }
+
+      let wpart = preference.cargo.price + delta * preference.cargo.karma;
+      let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
+
+      const estimate = {
+        //amount: amount,
+        amount: 10.00,
+        currency: 'ARS'
+      }
+
+      req.body.estimate = estimate
+      req.body.createdAt = moment().utc().format()
+
+      db.collection('preferences').insertOne(req.body, function(err,doc){
+        let data = {
+          id: doc.insertedId,
+          status: 'success',
+          estimate: estimate
+        }
+
+        return res.json(data)
+      })
     })
   })
 
