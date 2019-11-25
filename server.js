@@ -467,7 +467,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   })
 
 
-  app.post('/panel/list', checkToken, function (req, res) { 
+  app.post('/panel/list', function (req, res) { 
     var data = {}
     , type = req.body.type
     , view = req.body.view
@@ -491,8 +491,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     }
 
     if(type != 'preference'){
-      find.mercadopago = {}
-      find.mercadopago.status = type
+      find['mercadopago.status'] = type
     }
 
     db.collection('preferences').find(find)
