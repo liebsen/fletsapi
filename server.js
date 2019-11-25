@@ -482,15 +482,19 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       from = moment().utc().startOf(view),
       to = moment().utc().endOf(view)
     }
+    
+    var find = {
+      "createdAt": {
+        $gte: from.format(),
+        $lt: to.format()
+      }
+    }
 
-    db.collection('preferences').find(
-      {
-        "createdAt": 
-        {
-          $gte: from.format(),
-          $lt: to.format()
-        }
-      })
+    if(type != 'preference'){
+      find.mercadopago.status = type
+    }
+
+    db.collection('preferences').find(find)
       .sort({_id:-1})
       .limit(1000)
       .skip(0)
