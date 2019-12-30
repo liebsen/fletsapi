@@ -113,15 +113,15 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         delta = 0;
       }
 
+      let service = req.body.carga.service ? parseFloat(preference.cargo.service,10) : 0
       let wpart = parseFloat(preference.cargo.price,10) + delta * parseFloat(preference.cargo.karma,10);
-      let amount = parseFloat(Math.round(dpart + wpart)).toFixed(2);
+      let amount = parseFloat(Math.round(dpart + wpart) + service).toFixed(2);
 
       const estimate = {
         amount: parseInt(amount),
         //amount: 10.00,
         currency: 'ARS'
       }
-       
 
       req.body.estimate = estimate
       req.body.createdAt = moment().utc().format()
