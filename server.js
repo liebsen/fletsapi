@@ -85,6 +85,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     // calculo manual de cotizacion
     // todo : hacerlo dinamico para plataforma
 
+    if(!req.body.ruta.distance || !req.params.movil || !req.body.carga.peso) 
+      return res.json({status:'error',message:'Sin parámetros suficientes'})
+
     req.body.movil = req.params.movil 
 
     var ObjectId = require('mongodb').ObjectId; 
@@ -195,8 +198,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         }).then(function(preference){
           if(preference.value.mercadopago.status === 'approved'){
             emailClient.send({
-              to:'mafrith@gmail.com',
-              //to:'telemagico@gmail.com',
+              to:process.env.EMAIL_PRIMARY,
               subject:'Tenés un envío de FletsApp',
               data:{
                 title:'Marina: Te salió un envío!',
@@ -227,12 +229,11 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
 
   app.post('/contact', function (req, res) {  
     emailClient.send({
-      to:'mafrith@gmail.com',
-      //to:'telemagico@gmail.com',
+      to:process.env.EMAIL_PRIMARY, 
       subject:'Contacto desde FletsApp',
       data:{
         title:'Contacto desde FletsApp',
-        message: 'Nombre: ' + req.body.first_name + '<br>Apellido : ' + req.body.last_name + '<br>Email: ' + req.body.email + '<br>Comentarios : ' + req.body.comment + '<br>'
+        message: 'Nombre: ' + req.body.first_name + '<br>Apellido : ' + req.body.last_name + '<br>Email: ' + req.body.email + '<br>Teléfono: ' + req.body.phone + '<br>Comentarios: ' + req.body.comment + '<br>'
         //link: process.env.APP_URL + '/contact/' + notification.value.external_reference,
         //linkText:'Ver detalle del envío'
       },
