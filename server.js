@@ -22,7 +22,7 @@ const tokenExpires = 86400 * 30 * 12 // 1 year
 const saltRounds = 10;
 const allowedOrigins = [
   'http://localhost:4000',
-  'http://localhost:8080',
+  'http://0.0.0.0:8000',
   'https://localhost:8080',
   'https://fletsapp.herokuapp.com',
   'https://fletspanel.herokuapp.com',
