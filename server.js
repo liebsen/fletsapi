@@ -21,17 +21,19 @@ var jwt = require('jsonwebtoken')
 const tokenExpires = 86400 * 30 * 12 // 1 year
 const saltRounds = 10;
 const allowedOrigins = [
-  'http://localhost:4000',
-  'http://0.0.0.0:8000',
-  'https://localhost:8080',
+  'http://localhost:3000',
+  'https://localhost:3000',
   'https://fletsapp.herokuapp.com',
   'https://fletspanel.herokuapp.com',
   'https://fletsapi.herokuapp.com',
   'https://fletsapp.com'  
 ]
 
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false}))
 app.use(bodyParser.json({ type: 'application/json' }))
+app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({ limit: '50mb' }))
+
 app.set('views', path.join(__dirname, 'static'))
 app.use(express.static(path.join(__dirname, 'static')))
 app.set('view engine', 'ejs')
@@ -78,6 +80,24 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
   if(err) throw err
 
   const db = database.db(process.env.MONGO_URL.split('/').reverse()[0])
+
+  app.post('/flet/service_cost/:movil', function (req, res) {  
+
+    var ObjectId = require('mongodb').ObjectId; 
+    db.collection('accounts').find({
+      '_id': new ObjectId(req.params.movil)
+    }).toArray(function(err, results) {
+      if(!results[0]) return res.json({status:'error',message:'Falta código del sender.'})
+      const preference =  results[0].settings
+      let cost = preference.cargo.service ? parseFloat(preference.cargo.service,10) : 0
+      let currency = preference.cargo.currency ? preference.cargo.currency : 'ARS'
+      return res.json({
+        status: 'success', 
+        cost: cost, 
+        currency: currency
+      })
+    })
+  })
 
   app.post('/flet/estimate/:movil', function (req, res) {  
 
@@ -221,7 +241,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     } else {
      res.sendStatus(200)
     }
-  })  
+  })
 
   app.post('/procesar-pago', function (req, res) { 
     res.redirect(process.env.APP_URL + '/pago-completado/' + req.body.payment_status)
@@ -523,7 +543,7 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
     res.render('index')
   })
 
-  var server = http.listen(process.env.PORT, function () { //run http and web socket server
+  var server = http.listen(process.env.PORT || 4000, function () { //run http and web socket server
     var host = server.address().address;
     var port = server.address().port;
     console.log('Server listening at address ' + host + ', port ' + port);
