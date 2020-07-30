@@ -22,7 +22,7 @@ const tokenExpires = 86400 * 30 * 12 // 1 year
 const saltRounds = 10;
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://localhost:3000',
+  'http://localhost:8000',
   'https://fletsapp.herokuapp.com',
   'https://fletspanel.herokuapp.com',
   'https://fletsapi.herokuapp.com',
@@ -76,7 +76,7 @@ var random_code = function (factor){
   return Math.random().toString(36).substring(2, factor) + Math.random().toString(36).substring(2, factor)
 }
 
-mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, function(err, database) {
+mongodb.MongoClient.connect(process.env.MONGO_URL, {useUnifiedTopology: true, useNewUrlParser: true }, function(err, database) {
   if(err) throw err
 
   const db = database.db(process.env.MONGO_URL.split('/').reverse()[0])
@@ -120,14 +120,14 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
       // ie: price + (value - basic) * karma
 
       // distance
-      let distance = Math.round(req.body.ruta.distance.value/1000) // in km
-      var delta = distance - parseFloat(preference.route.min,10);
+      let distance = parseFloat(req.body.ruta.distance.value, 10); // in km
+      var delta = distance - parseFloat(preference.route.min, 10);
 
       if(delta < 0){
         delta = 0;
       }
 
-      let dpart = parseFloat(preference.route.price) + delta * parseFloat(preference.route.karma,10);
+      let dpart = parseFloat(preference.route.price, 10) + delta * parseFloat(preference.route.karma, 10);
 
       // weight 
       delta = req.body.carga.peso - parseFloat(preference.cargo.min,10);
@@ -136,8 +136,8 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useNewUrlParser: true }, fun
         delta = 0;
       }
 
-      let service = req.body.carga.service ? parseFloat(preference.cargo.service,10) : 0
-      let wpart = parseFloat(preference.cargo.price,10) + delta * parseFloat(preference.cargo.karma,10);
+      let service = req.body.carga.service ? parseFloat(preference.cargo.service, 10) : 0
+      let wpart = parseFloat(preference.cargo.price, 10) + delta * parseFloat(preference.cargo.karma, 10);
       let amount = parseFloat(Math.round(dpart + wpart) + service).toFixed(2);
 
       const estimate = {
