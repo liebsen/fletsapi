@@ -26,7 +26,9 @@ const allowedOrigins = [
   'https://fletsapp.herokuapp.com',
   'https://fletspanel.herokuapp.com',
   'https://fletsapi.herokuapp.com',
-  'https://fletsapp.com'  
+  'https://fletsapp.com',
+  'https://panel.fletsapp.com',
+  'https://api.fletsapp.com'
 ]
 
 app.use(bodyParser.urlencoded({ extended: false}))
