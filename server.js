@@ -171,21 +171,27 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useUnifiedTopology: true, us
       '_id': new ObjectId(req.body.id)
     }).toArray(function(err, results) {
       if(results.length && results[0].estimate.amount){
+        let total = parseFloat(results[0].estimate.amount)
+        let api_url = req.protocol + '://' + req.get('host')
         let preference = {
           items: [
             {
               id: req.body.id,
               title: 'Envío con FletsApp',
-              description: "",
-              unit_price: parseFloat(results[0].estimate.amount),
+              description: `Servicio de entrega FletsApp costo ${total}ARS`,
+              unit_price: total,
               currency_id: "ARS",
               quantity: 1
             }
           ],
-          notification_url: req.protocol + '://' + req.get('host') + "/mercadopago/notification",
+          back_urls: {
+            success: api_url + `/pago-completado/approved`,
+            failure: api_url + `/pago-completado/rejected`,
+            pending: api_url + `/pago-completado/in_process`
+          },
+          notification_url: api_url + "/mercadopago/notification",
           external_reference: req.body.id
         };
-
         mercadopago.preferences.create(preference).then(function(response){
           return res.json(response.body)
         }).catch(function(error){
