@@ -185,9 +185,9 @@ mongodb.MongoClient.connect(process.env.MONGO_URL, {useUnifiedTopology: true, us
             }
           ],
           back_urls: {
-            success: api_url + `/pago-completado/approved`,
-            failure: api_url + `/pago-completado/rejected`,
-            pending: api_url + `/pago-completado/in_process`
+            success: process.env.APP_URL + `/pago-completado/approved`,
+            failure: process.env.APP_URL + `/pago-completado/rejected`,
+            pending: process.env.APP_URL + `/pago-completado/in_process`
           },
           notification_url: api_url + "/mercadopago/notification",
           external_reference: req.body.id
