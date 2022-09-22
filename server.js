@@ -23,9 +23,9 @@ const saltRounds = 10;
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:8000',
-  'https://fletsapp.herokuapp.com',
-  'https://fletspanel.herokuapp.com',
-  'https://fletsapi.herokuapp.com',
+  'https://fletsapp.overlemon.com',
+  'https://panel.fletsapp.overlemon.com',
+  'https://api.fletsapp.overlemon.com',
   'https://fletsapp.com',
   'https://panel.fletsapp.com',
   'https://api.fletsapp.com'
