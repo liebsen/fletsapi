@@ -28,6 +28,7 @@ const allowedOrigins = [
   'https://panel.fletsapp.overlemon.com',
   'https://api.fletsapp.overlemon.com'
 ]
+
 app.use(bodyParser.urlencoded({ extended: false}))
 app.use(bodyParser.json({ type: 'application/json' }))
 app.use(express.json({ limit: '50mb' }))
