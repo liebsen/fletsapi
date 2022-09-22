@@ -24,11 +24,9 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:8000',
   'https://fletsapp.overlemon.com',
-  'https://panel.fletsapp.overlemon.com',
-  'https://api.fletsapp.overlemon.com',
   'https://fletsapp.com',
-  'https://panel.fletsapp.com',
-  'https://api.fletsapp.com'
+  'https://panel.fletsapp.overlemon.com',
+  'https://api.fletsapp.overlemon.com'
 ]
 
 app.use(bodyParser.urlencoded({ extended: false}))
